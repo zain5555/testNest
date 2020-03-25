@@ -1,4 +1,11 @@
+import * as moment from 'moment';
+
 export const roles: string[] = ['manager', 'employee'];
+
+export const enum RolesEnum {
+  MANAGER = 'manager',
+  EMPLOYEE = 'employee'
+}
 
 import { SignOptions } from 'jsonwebtoken';
 
@@ -18,3 +25,24 @@ export const enum nodeEnv {
 export const sessionName = 'nowdhcuot';
 
 export const systemName = 'touchdown';
+
+export const plans = {
+  trial: {
+    name: 'trial',
+    pricePerUser: 0,
+    billingCycleDays: 49,
+    maxUsers: 4,
+  },
+  basic: {
+    name: 'basic',
+    pricePerUser: 5,
+    billingCycleDays: 30,
+    maxUsers: 10,
+  },
+};
+
+export const defaultPlan = {
+  ...plans.trial,
+  startedOn: moment(Date.now()).startOf('day'),
+  expiredAt: moment(Date.now()).add(plans.trial.billingCycleDays, 'days').startOf('day'),
+};
