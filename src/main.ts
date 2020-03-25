@@ -39,7 +39,7 @@ async function bootstrap(): Promise<void> {
   app.use(helmet());
   if (config.nodeEnv !== nodeEnv.PRODUCTION) {
     app.enableCors({
-      origin: ['http://localhost:3000', 'http://localhost:8081'],
+      origin: ['http://localhost:8080', 'http://localhost:8081'],
       credentials: true,
     });
   }
