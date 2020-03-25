@@ -5,12 +5,12 @@ import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { RedisModule } from 'nestjs-redis';
+import { SchemaModule } from './schema/schema.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => ({
         uri: config.mongoUri,
@@ -22,9 +22,9 @@ import { RedisModule } from 'nestjs-redis';
     }),
     RedisModule.forRootAsync({
       inject: [ConfigService],
-      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({url: configService.redisUri}),
     }),
+    SchemaModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

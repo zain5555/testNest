@@ -1,5 +1,10 @@
 export const roles: string[] = ['manager', 'employee'];
 
+export const enum RolesEnum {
+  MANAGER = 'manager',
+  EMPLOYEE = 'employee'
+}
+
 import { SignOptions } from 'jsonwebtoken';
 
 export const defaultJWTSignOptions: SignOptions = {
