@@ -4,7 +4,7 @@ import { defaultPlan, plans, roles } from '../common/constants';
 
 const SubscriptionSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  pricePerUser: { type: String, required: true },
+  pricePerUser: { type: Number, required: true },
   billingCycleDays: { type: Number, required: true },
   maxUsers: { type: Number, required: true },
   startedOn: { type: Date, required: true },
@@ -26,9 +26,9 @@ export const CompanySchema = new mongoose.Schema({
 export interface SubscriptionInterface {
   _id?: string;
   name: string;
-  pricePerUser: string;
-  billingCycleDays: string;
-  maxUsers: string;
+  pricePerUser: number;
+  billingCycleDays: number;
+  maxUsers: number;
   startedOn: string;
   expiredAt: string;
   createdAt?: string;
@@ -38,7 +38,6 @@ export interface SubscriptionInterface {
 export interface CompanyInterface {
   _id?: string;
   name: string;
-  creator?: string;
   subscription?: SubscriptionInterface;
   isActive?: boolean;
   createdAt?: string;

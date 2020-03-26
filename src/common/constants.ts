@@ -43,8 +43,8 @@ export const plans = {
 
 export const defaultPlan = {
   ...plans.trial,
-  startedOn: moment(Date.now()).startOf('day'),
-  expiredAt: moment(Date.now()).add(plans.trial.billingCycleDays, 'days').startOf('day'),
+  startedOn: moment(Date.now()).utc(),
+  expiredAt: moment(Date.now()).utc().add(plans.trial.billingCycleDays, 'days'),
 };
 
 export const enum StrategyNames {
