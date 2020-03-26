@@ -23,7 +23,6 @@ export class AuthService {
   async validateUser(credentials: LoginDto): Promise<MeInterface | undefined> {
     const user: MeInterface = await this.userService.findOneWherePopulated({ email: credentials.email });
     if (user && user.password && user.isActive && bcrypt.compareSync(credentials.password, user.password)) {
-      delete user.password;
       return user;
     }
     return undefined;
