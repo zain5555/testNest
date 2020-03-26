@@ -3,6 +3,7 @@ import { roles, RolesEnum } from '../common/constants';
 
 const SubCompanySchema = new mongoose.Schema({
   company: { type: mongoose.Schema.ObjectId, required: true, ref: 'Company' }, /** from user-Collection **/
+  creator: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
   role: { type: String, enum: roles, required: true },
 }, {
@@ -22,6 +23,7 @@ export const UserSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    autoCreate: true,
   },
 );
 
@@ -29,6 +31,7 @@ export interface SubCompanyInterface {
   _id?: string;
   company?: string;
   isActive?: boolean;
+  creator?: boolean;
   role?: string;
   createdAt?: string;
   updatedAt?: string;

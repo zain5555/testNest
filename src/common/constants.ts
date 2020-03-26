@@ -46,3 +46,7 @@ export const defaultPlan = {
   startedOn: moment(Date.now()).startOf('day'),
   expiredAt: moment(Date.now()).add(plans.trial.billingCycleDays, 'days').startOf('day'),
 };
+
+export const enum StrategyNames {
+  REGISTER_STRATEGY = 'register'
+}
