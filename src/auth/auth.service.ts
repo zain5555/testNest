@@ -10,6 +10,7 @@ import { startCase } from 'lodash';
 import { UserInterface } from '../schema/user.schema';
 import { ErrorMessages, HttpErrors } from '../common/errors';
 import { RolesEnum } from '../common/constants';
+import { CompanyInterface } from '../schema/company.schema';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
   ) {
   }
   
-  async validateUser(credentials: LoginDto): Promise<MeInterface> {
+  async validateUser(credentials: LoginDto): Promise<MeInterface | undefined> {
     const user: MeInterface = await this.userService.findOneWherePopulated({ email: credentials.email });
     if (user && user.password && user.isActive && bcrypt.compareSync(credentials.password, user.password)) {
       delete user.password;
@@ -33,8 +34,8 @@ export class AuthService {
   }
   
   async register(registerInfo: RegisterInterface): Promise<UserInterface> {
-    const email = registerInfo.email.trim().toLowerCase();
-    const existingUser = await this.userService.findOneWhere({ email });
+    const email: string = registerInfo.email.trim().toLowerCase();
+    const existingUser: UserInterface = await this.userService.findOneWhere({ email });
     if (existingUser && existingUser.isActive) {
       throw new ConflictException({
         statusCode: HttpStatus.CONFLICT,
@@ -52,14 +53,14 @@ export class AuthService {
     try {
       session = await this.companyService.getSession();
       await session.startTransaction();
-      const newCompany = await this.companyService.insertOne({ name: registerInfo.companyName.trim() }, { session });
+      const newCompany: CompanyInterface = await this.companyService.insertOne({ name: registerInfo.companyName.trim() }, { session });
       newUser.companies = [{
         company: newCompany._id,
         role: RolesEnum.MANAGER,
         creator: true,
         isActive: true,
       }];
-      const insertedUser = await this.userService.insertOne(newUser, { session });
+      const insertedUser: UserInterface = await this.userService.insertOne(newUser, { session });
       await session.commitTransaction();
       // send email for activation here
       return insertedUser;

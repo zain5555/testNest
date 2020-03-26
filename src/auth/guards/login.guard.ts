@@ -3,12 +3,13 @@ import { AuthGuard } from '@nestjs/passport';
 import { LoginDto } from '../types/dto/auth.dto';
 import { HttpErrors } from '../../common/errors';
 import { validate } from 'class-validator';
+import { CredentialsInterface } from '../types/interfaces/auth.interface';
 
 @Injectable()
 export class LoginGuard extends AuthGuard('local') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const credentials = new LoginDto(req.body);
+    const credentials: CredentialsInterface = new LoginDto(req.body);
     const errors = await validate(credentials);
     if (errors.length) {
       throw new BadRequestException({
