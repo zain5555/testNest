@@ -6,6 +6,9 @@ import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
 import { RedisModule } from 'nestjs-redis';
 import { SchemaModule } from './schema/schema.module';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { CompanyModule } from './company/company.module';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { SchemaModule } from './schema/schema.module';
       useFactory: async (configService: ConfigService) => ({url: configService.redisUri}),
     }),
     SchemaModule.forRoot(),
+    UserModule,
+    AuthModule,
+    CompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
