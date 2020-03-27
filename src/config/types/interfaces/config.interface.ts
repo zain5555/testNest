@@ -4,4 +4,5 @@ export interface ConfigInterface {
   MONGO_URI: string;
   JWT_SECRET: string;
   REDIS_URI: string;
+  FRONTEND_APP_URI: string;
 }

@@ -1,7 +1,6 @@
 import * as mongoose from 'mongoose';
 
 export const InvitationSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.ObjectId, required: false },
   email: { type: String, required: true },
   company: { type: mongoose.Schema.ObjectId, required: true, ref: 'Company' }, /** from company-Collection **/
   invitedBy: { type: mongoose.Schema.ObjectId, required: true, ref: 'User' },
@@ -13,8 +12,7 @@ export const InvitationSchema = new mongoose.Schema({
 });
 
 export interface InvitationInterface {
-  _id?: mongoose.Schema.ObjectId;
-  user?: mongoose.Schema.ObjectId;
+  _id?: string;
   email?: string;
   isActive?: boolean;
   isAccepted?: boolean;

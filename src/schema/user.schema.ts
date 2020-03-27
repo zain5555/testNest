@@ -5,7 +5,7 @@ const SubCompanySchema = new mongoose.Schema({
   company: { type: mongoose.Schema.ObjectId, required: true, ref: 'Company' }, /** from user-Collection **/
   creator: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
-  role: { type: String, enum: roles, required: true },
+  role: { type: String, enum: roles, required: true, default: RolesEnum.EMPLOYEE },
 }, {
   timestamps: true,
 });

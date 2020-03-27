@@ -27,6 +27,7 @@ export class ConfigService {
       MONGO_URI: Joi.string().required(),
       JWT_SECRET: Joi.string().required(),
       REDIS_URI: Joi.string().required(),
+      FRONTEND_APP_URI: Joi.string().uri().required(),
     });
 
     const { error, value: validatedEnvConfig } = envVarsSchema.validate(
@@ -60,5 +61,9 @@ export class ConfigService {
 
   get redisUri(): string {
     return this.envConfig.REDIS_URI;
+  }
+  
+  get frontendAppUri(): string {
+    return this.envConfig.FRONTEND_APP_URI;
   }
 }

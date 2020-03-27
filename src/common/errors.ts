@@ -20,6 +20,16 @@ export enum ErrorMessages {
   GENERIC_FORBIDDEN = 'You do not have necessary permissions to execute this request!',
   GENERIC_CONFLICT = 'Conflict',
   GENERIC_NOT_FOUND = 'Resource Not Found!',
+  COMPANY_NOT_FOUND = 'Company Not Found!',
+  MAX_USER_LIMIT_REACHED = 'Maximum users limit reached! Please upgrade your subscription plan to add more users!',
+  ALREADY_INVITED = '? is already invited!',
+  ALREADY_MEMBER = '? is already part of your company!',
+  INVITATION_NOT_FOUND = 'Invitation Not Found!',
+  ALREADY_ACCEPTED = 'Already Accepted!',
+  INVITATION_REVOKED = 'Your invitation has been revoked!',
+  INVALID_JWT = 'Invalid jwt token!',
+  REGISTER_FIRST = 'Please sign up first to activate your account!',
+  ALREADY_VERIFIED = 'Your account is already activated!',
 }
 
 export const enum ResponseMessages {

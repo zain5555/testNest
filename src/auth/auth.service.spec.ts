@@ -6,11 +6,11 @@ import { company, populatedUser, user } from '../../test/data/auth.data';
 import { HttpStatus } from '@nestjs/common';
 import { ErrorMessages, HttpErrors } from '../common/errors';
 import { defaultInternalServerErrorResponse } from '../common/responses';
+import { StringHelper } from '../helper/string.helper';
 
 describe('AuthService', () => {
   let service: AuthService;
   let userService: UserService;
-  let companyService: CompanyService;
   
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,14 +34,18 @@ describe('AuthService', () => {
               commitTransaction: jest.fn(() => true),
             })),
             insertOne: jest.fn(() => company),
+            findOneAndUpdateWhere: jest.fn(() => true),
           },
+        },
+        {
+          provide: StringHelper,
+          useValue: {},
         },
       ],
     }).compile();
     
     service = module.get<AuthService>(AuthService);
     userService = module.get<UserService>(UserService);
-    companyService = module.get<CompanyService>(CompanyService);
   });
   
   it('should be defined', () => {
@@ -70,7 +74,7 @@ describe('AuthService', () => {
       firstName: populatedUser.firstName,
       password: 'touchdowndemo',
       avatar: '',
-    })).toMatchObject(user);
+    }, false)).toMatchObject(user);
   });
   
   it('should throw conflict error', async () => {
@@ -82,7 +86,7 @@ describe('AuthService', () => {
         firstName: populatedUser.firstName,
         password: 'touchdowndemo',
         avatar: '',
-      });
+      }, false);
     } catch (e) {
       expect(e.message).toMatchObject({
         statusCode: HttpStatus.CONFLICT,
@@ -94,7 +98,9 @@ describe('AuthService', () => {
   
   it('should throw internal server error', async () => {
     jest.spyOn(userService, 'findOneWhere').mockImplementationOnce(() => undefined);
-    jest.spyOn(userService, 'insertOne').mockImplementationOnce(() => { throw new Error('e') });
+    jest.spyOn(userService, 'insertOne').mockImplementationOnce(() => {
+      throw new Error('e');
+    });
     try {
       await service.register({
         companyName: company.name,
@@ -103,7 +109,7 @@ describe('AuthService', () => {
         firstName: populatedUser.firstName,
         password: 'touchdowndemo',
         avatar: '',
-      });
+      }, false);
     } catch (e) {
       expect(e.message).toMatchObject(defaultInternalServerErrorResponse);
     }
