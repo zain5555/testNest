@@ -52,7 +52,7 @@ export class InvitationService {
     }
   }
   
-  async findAllWhere(where): Promise<InvitationInterface[]> {
+  async findAllWhere(where: unknown): Promise<InvitationInterface[]> {
     try {
       return await this.invitationModel.find(where).lean();
     } catch (e) {
