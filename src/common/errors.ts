@@ -34,7 +34,7 @@ export enum ErrorMessages {
 
 export const enum ResponseMessages {
   FORGOT_PASSWORD = 'An email has been sent with reset password instructions! Please check your email!',
-  INVITED_SUCCESSFULLY = 'Invited Successfully!',
+  INVITED_SUCCESSFULLY = '? has been invited!',
   SUCCESS = 'Success!',
   REGISTER_SUCCESS = 'We have sent you an activation email! Please check your email to activate your account!'
 }

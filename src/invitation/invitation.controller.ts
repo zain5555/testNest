@@ -7,7 +7,6 @@ import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse, ApiNotFoundResponse,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse, ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
@@ -15,10 +14,9 @@ import { GenericUnauthorizedResponse, InternalServerErrorWithMessage } from '../
 import { HttpErrors } from '../common/errors';
 import {
   AcceptInvitationConflictResponse, AcceptInvitationNotFoundResponse, AcceptInvitationUPResponse,
-  AddInvitationConflictResponse,
-  AddInvitationPaymentRequiredResponse,
   AddInvitationSuccessResponse,
 } from './types/responses/invitation.response';
+import { uniq } from 'lodash';
 
 @ApiTags('Invitation')
 @UseGuards(AuthenticatedGuard)
@@ -28,16 +26,14 @@ export class InvitationController {
   }
   
   @Post()
-  @ApiCreatedResponse({ description: 'OK', type: AddInvitationSuccessResponse })
-  @ApiResponse({ status: HttpStatus.PAYMENT_REQUIRED, description: HttpErrors.PAYMENT_REQUIRED, type: AddInvitationPaymentRequiredResponse })
-  @ApiConflictResponse({ description: HttpErrors.CONFLICT, type: AddInvitationConflictResponse })
+  @ApiCreatedResponse({ description: 'OK', type: AddInvitationSuccessResponse, isArray: true })
   @ApiUnauthorizedResponse({ description: 'Unauthorized Request!', type: GenericUnauthorizedResponse })
   @ApiInternalServerErrorResponse({
     description: HttpErrors.INTERNAL_SERVER_ERROR,
     type: InternalServerErrorWithMessage,
   })
   async invite(@Req() req: RequestWithUser, @Body() body: AddInvitationDto): Promise<any> {
-    return this.invitationService.invite(body.companyId, body.email.trim().toLowerCase(), req.user);
+    return this.invitationService.invite(body.companyId, uniq(body.emails.map(email => email.trim().toLowerCase())), req.user);
   }
   
   @Post(':invitationId/accept')

@@ -20,7 +20,7 @@ import { MeInterface } from '../user/types/interfaces/user.interface';
 import { ErrorMessages, HttpErrors, ResponseMessages } from '../common/errors';
 import { UserService } from '../user/user.service';
 import { UserInterface } from '../schema/user.schema';
-import { AddInvitationResponseInterface, InvitationJwtInterface } from './types/interfaces/invitation.interface';
+import { AddInvitationResponseInterface, InsertedInvitationsInterface, InvitationJwtInterface } from './types/interfaces/invitation.interface';
 
 @Injectable()
 export class InvitationService {
@@ -71,6 +71,15 @@ export class InvitationService {
     }
   }
   
+  async insertMany(invitations: InvitationInterface[]): Promise<InsertedInvitationsInterface[]> {
+    try {
+      return await this.invitationModel.create(invitations);
+    } catch (e) {
+      console.warn(e);
+      throw new InternalServerErrorException(defaultInternalServerErrorResponse);
+    }
+  }
+  
   async findOneAndUpdateWhere(newValuesOfUser: unknown, where: unknown, options?: QueryFindOneAndUpdateOptionsInterface): Promise<InvitationInterface | QueryUpdateInterface> {
     try {
       return await this.invitationModel.findOneAndUpdate(where, newValuesOfUser, options);
@@ -80,10 +89,12 @@ export class InvitationService {
     }
   }
   
-  async invite(companyId: string, email: string, user: MeInterface): Promise<AddInvitationResponseInterface> {
+  async invite(companyId: string, emails: string[], user: MeInterface): Promise<AddInvitationResponseInterface[]> {
     const company: CompanyInterface = await this.companyService.getIfCompanyExistsAndIAmManager(companyId, user._id);
-    const existingUser: UserInterface = await this.userService.findOneWhere({
-      email,
+    const existingUsers: UserInterface[] = await this.userService.findAllWhere({
+      email: {
+        $in: emails,
+      },
       isActive: true,
       companies: {
         $elemMatch: {
@@ -92,44 +103,58 @@ export class InvitationService {
         },
       },
     });
-    if (existingUser) {
-      throw new ConflictException({
-        statusCode: HttpStatus.CONFLICT,
-        error: HttpErrors.CONFLICT,
-        message: ErrorMessages.ALREADY_MEMBER.replace('?', email),
-      });
-    }
     const existingInvitationsOfCompany: InvitationInterface[] = await this.findAllWhere({
       company: companyId,
       isActive: true,
       isAccepted: false,
     });
-    const existingInvitation: InvitationInterface = existingInvitationsOfCompany?.find(invite => invite.email === email);
-    if (existingInvitation) {
-      throw new ConflictException({
-        statusCode: HttpStatus.CONFLICT,
-        error: HttpErrors.CONFLICT,
-        message: ErrorMessages.ALREADY_INVITED.replace('?', email),
+    const newInvitations: InvitationInterface[] = [];
+    const response: AddInvitationResponseInterface[] = [];
+    for (const email of emails) {
+      const userExisted = existingUsers.find(user => user.email === email);
+      if (userExisted) {
+        response.push({
+          invitationId: null,
+          message: ErrorMessages.ALREADY_MEMBER.replace('?', email),
+          email,
+        });
+        continue;
+      }
+      const existingInvitation: InvitationInterface = existingInvitationsOfCompany?.find(invite => invite.email === email);
+      if (existingInvitation) {
+        response.push({
+          invitationId: null,
+          message: ErrorMessages.ALREADY_INVITED.replace('?', email),
+          email,
+        });
+        continue;
+      }
+      if (company?.users?.length + existingInvitationsOfCompany?.length + newInvitations.length >= company.subscription.maxUsers) {
+        response.push({
+          invitationId: null,
+          message: ErrorMessages.MAX_USER_LIMIT_REACHED,
+          email,
+        });
+        continue;
+      }
+      newInvitations.push({
+        email,
+        invitedBy: user._id,
+        company: companyId,
       });
     }
-    if (company?.users?.length + existingInvitationsOfCompany?.length >= company.subscription.maxUsers) {
-      throw new HttpException({
-        statusCode: HttpStatus.PAYMENT_REQUIRED,
-        error: HttpErrors.PAYMENT_REQUIRED,
-        message: ErrorMessages.MAX_USER_LIMIT_REACHED,
-      }, HttpStatus.PAYMENT_REQUIRED);
+    if (newInvitations.length) {
+      const insertedInvitations: InsertedInvitationsInterface[] = await this.insertMany(newInvitations);
+      for (const invitation of insertedInvitations) {
+        response.push({
+          invitationId: invitation._doc._id,
+          email: invitation._doc.email,
+          message: ResponseMessages.INVITED_SUCCESSFULLY.replace('?', invitation._doc.email),
+        });
+        this.sendInvitationLink(invitation._doc._id, null, invitation._doc, company);
+      }
     }
-    const invitation: InvitationInterface = await this.insertOne({
-      company: companyId,
-      email,
-      invitedBy: user._id,
-    });
-    await this.sendInvitationLink(invitation._id, undefined, invitation, company);
-    return {
-      email,
-      message: ResponseMessages.INVITED_SUCCESSFULLY,
-      invitationId: invitation._id,
-    };
+    return response;
   }
   
   async fetchInvitationDetails(invitationId: string, email?: string): Promise<InvitationInterface> {

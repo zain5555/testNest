@@ -6,9 +6,11 @@ export class AddInvitationDto {
   @IsMongoId()
   companyId: string;
   
-  @ApiProperty({ example: 'demo@touchdown.com' })
-  @IsEmail()
-  email: string;
+  @ApiProperty({ example: ['demo@touchdown.com'] })
+  @IsEmail({}, {
+    each: true,
+  })
+  emails: string[];
 }
 
 export class InvitationIdDto {

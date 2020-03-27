@@ -59,7 +59,7 @@ export class CompanyService {
       throw new NotFoundException({
         statusCode: HttpStatus.NOT_FOUND,
         error: HttpErrors.NOT_FOUND,
-        message: ErrorMessages,
+        message: ErrorMessages.COMPANY_NOT_FOUND,
       });
     }
     return company;

@@ -2,22 +2,6 @@ import { Conflict, NotFound, PaymentRequiredResponse, UnprocessableEntityRespons
 import { ApiProperty } from '@nestjs/swagger';
 import { ErrorMessages, ResponseMessages } from '../../../common/errors';
 
-export class AddInvitationPaymentRequiredResponse extends PaymentRequiredResponse {
-  @ApiProperty({ example: ErrorMessages.MAX_USER_LIMIT_REACHED })
-  message: string;
-}
-
-export class AddInvitationConflictResponse extends Conflict {
-  @ApiProperty({
-    example: ErrorMessages.ALREADY_MEMBER.replace('?', 'demo@touchdown.com'),
-    enum: [
-      ErrorMessages.ALREADY_MEMBER.replace('?', 'demo@touchdown.com'),
-      ErrorMessages.ALREADY_INVITED.replace('?', 'demo@touchdown.com'),
-    ],
-  })
-  message: string;
-}
-
 export class AddInvitationSuccessResponse {
   @ApiProperty({ example: 'demo@touchdown.com' })
   email: string;
