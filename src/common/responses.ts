@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { HttpStatus } from '@nestjs/common';
 import { HttpErrors } from './errors';
 import { ErrorMessages, ResponseMessages } from './errors';
@@ -118,7 +118,7 @@ export class NotFoundWithMessage extends NotFound {
 }
 
 export class InternalServerErrorWithMessage extends InternalServerError {
-  @ApiProperty({ example: 'Please try again later!' })
+  @ApiPropertyOptional({ example: 'Please try again later!' })
   message: string;
 }
 
@@ -222,18 +222,29 @@ export class GenericBadRequestResponseForIdCheck extends BadRequest {
 }
 
 export class DefaultForbiddenResponseDoc {
+  @ApiProperty({ example: HttpStatus.FORBIDDEN })
+  statusCode: number;
+  
+  @ApiProperty({ example: HttpErrors.FORBIDDEN })
+  error: string;
+  
   @ApiProperty({ example: ErrorMessages.GENERIC_FORBIDDEN })
   message: string;
-  
-  @ApiProperty({example: HttpStatus.FORBIDDEN})
-  statusCode: number;
 }
 
 export class NotFoundResponse {
-  @ApiProperty({example: HttpStatus.NOT_FOUND})
+  @ApiProperty({ example: HttpStatus.NOT_FOUND })
   statusCode: number;
   
-  @ApiProperty({ example: ErrorMessages.GENERIC_NOT_FOUND })
-  message: string;
+  @ApiProperty({ example: HttpErrors.NOT_FOUND })
+  error: string;
+}
+
+export class PaymentRequiredResponse {
+  @ApiProperty({ example: HttpStatus.PAYMENT_REQUIRED })
+  statusCode: number;
+  
+  @ApiProperty({ example: HttpErrors.PAYMENT_REQUIRED })
+  error: string;
 }
 

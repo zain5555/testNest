@@ -10,7 +10,7 @@ export const enum RolesEnum {
 import { SignOptions } from 'jsonwebtoken';
 
 export const defaultJWTSignOptions: SignOptions = {
-  issuer: 'worky',
+  issuer: 'touchdown',
   algorithm: 'HS256',
 };
 

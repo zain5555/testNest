@@ -9,6 +9,8 @@ import { SchemaModule } from './schema/schema.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CompanyModule } from './company/company.module';
+import { InvitationModule } from './invitation/invitation.module';
+import { HelperModule } from './helper/helper.module';
 
 @Module({
   imports: [
@@ -25,14 +27,18 @@ import { CompanyModule } from './company/company.module';
     }),
     RedisModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({url: configService.redisUri}),
+      useFactory: async (configService: ConfigService) => ({ url: configService.redisUri }),
     }),
     SchemaModule.forRoot(),
+    HelperModule.forRoot(),
     UserModule,
     AuthModule,
     CompanyModule,
+    InvitationModule,
+    HelperModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+}

@@ -1,7 +1,8 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CredentialsInterface, RegisterInterface } from '../interfaces/auth.interface';
+import { CredentialsInterface, RegisterByInvitationInterface, RegisterInterface } from '../interfaces/auth.interface';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger/dist/decorators/api-model-property.decorator';
+import { JwtDto } from '../../../common/dto';
 
 export class LoginDto {
   // decorator for API Documentation!
@@ -97,6 +98,54 @@ export class RegisterDto {
       this.lastName = user.lastName;
       this.companyName = user.companyName;
       this.avatar = user.avatar;
+    }
+  }
+}
+
+export class RegisterByInvitationDto extends JwtDto{
+  @ApiModelProperty({
+    format: 'Only Capital, Small English Letters And Spaces!',
+    example: 'Afzaal',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^[a-z ]+$/i, {
+    message: () => {
+      return 'fullName must contains only alphabets and spaces!';
+    },
+  })
+  firstName: string;
+  
+  @ApiModelProperty({
+    format: 'Only Capital, Small English Letters And Spaces!',
+    example: 'Ahmad',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Matches(/^[a-z ]+$/i, {
+    message: () => {
+      return 'fullName must contains only alphabets and spaces!';
+    },
+  })
+  lastName: string;
+  
+  @ApiModelProperty({
+    minLength: 8,
+    maxLength: 64,
+    example: 'workydemo',
+  })
+  // validation decorators for password field!
+  @IsString()
+  @Length(8, 64)
+  password: string;
+  
+  constructor(data?: RegisterByInvitationInterface) {
+    super();
+    if(data) {
+      this.jwt = data.jwt;
+      this.password = data.password;
+      this.firstName = data.firstName;
+      this.lastName = data.lastName;
     }
   }
 }

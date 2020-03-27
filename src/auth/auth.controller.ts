@@ -1,22 +1,33 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginGuard } from './guards/login.guard';
 import { RequestWithUser } from '../common/interfaces';
-import { LoginDto, RegisterDto } from './types/dto/auth.dto';
+import { LoginDto, RegisterByInvitationDto, RegisterDto } from './types/dto/auth.dto';
 import { MeInterface } from '../user/types/interfaces/user.interface';
 import { RegisterGuard } from './guards/register.guard';
 import {
   ApiConflictResponse,
   ApiCreatedResponse,
-  ApiInternalServerErrorResponse,
+  ApiInternalServerErrorResponse, ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
+  ApiUnauthorizedResponse, ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { HttpErrors } from '../common/errors';
 import { AuthFailedWithInvalidCredentials, GenericUnauthorizedResponse, InternalServerErrorWithMessage } from '../common/responses';
 import { MeResponse } from '../user/types/responses/user.response';
+import { InvitationGuard } from './guards/invitation.guard';
+import { EmailDto } from '../user/types/dto/user.dto';
+import { JwtDto } from '../common/dto';
+import { UserInterface } from '../schema/user.schema';
+import {
+  ActivatingAccountUnprocessableEntityResponse,
+  ActivationConflictResponse,
+  ActivationUnprocessableEntityResponse,
+  RegisterConflictResponse,
+} from './types/responses/auth.response';
+import { AcceptInvitationNotFoundResponse } from '../invitation/types/responses/invitation.response';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -38,16 +49,67 @@ export class AuthController {
     return user;
   }
   
-  @UseGuards(RegisterGuard)
   @Post('register')
-  @ApiCreatedResponse({ description: 'OK', type: MeResponse })
-  @ApiConflictResponse({ description: HttpErrors.CONFLICT })
+  @ApiCreatedResponse({ description: 'OK', type: Boolean })
+  @ApiConflictResponse({ description: HttpErrors.CONFLICT, type: RegisterConflictResponse })
   @ApiInternalServerErrorResponse({
     description: HttpErrors.INTERNAL_SERVER_ERROR,
     type: InternalServerErrorWithMessage,
   })
-  async register(@Req() request: RequestWithUser, @Body() body: RegisterDto): Promise<MeInterface> {
-    const user = request.user;
+  async register(@Req() request: RequestWithUser, @Body() body: RegisterDto): Promise<boolean> {
+    const user: UserInterface = await this.authService.register(body, false);
+    return await this.authService.sendActivationLink(user.email, user);
+  }
+  
+  @Get('register/verify/link')
+  @ApiOkResponse({ description: 'OK', type: Boolean })
+  @ApiConflictResponse({ description: HttpErrors.CONFLICT, type: ActivationConflictResponse })
+  @ApiUnprocessableEntityResponse({
+    description: HttpErrors.UNPROCESSABLE_ENTITY,
+    type: ActivationUnprocessableEntityResponse })
+  @ApiInternalServerErrorResponse({
+    description: HttpErrors.INTERNAL_SERVER_ERROR,
+    type: InternalServerErrorWithMessage,
+  })
+  async getVerificationLink(@Query() query: EmailDto): Promise<boolean> {
+    return this.authService.sendActivationLink(query.email);
+  }
+  
+  @UseGuards(RegisterGuard)
+  @Post('register/verify')
+  @ApiCreatedResponse({ description: 'OK', type: MeResponse })
+  @ApiConflictResponse({ description: HttpErrors.CONFLICT, type: ActivationConflictResponse })
+  @ApiUnprocessableEntityResponse({
+    description: HttpErrors.UNPROCESSABLE_ENTITY,
+    type: ActivatingAccountUnprocessableEntityResponse
+  })
+  @ApiInternalServerErrorResponse({
+    description: HttpErrors.INTERNAL_SERVER_ERROR,
+    type: InternalServerErrorWithMessage,
+  })
+  async verifyMe(@Req() req: RequestWithUser, @Body() body: JwtDto): Promise<MeInterface> {
+    const user = req.user;
+    delete user.password;
+    return user;
+  }
+  
+  @UseGuards(InvitationGuard)
+  @Post('register/invite')
+  @ApiCreatedResponse({ description: 'OK', type: MeResponse })
+  @ApiUnprocessableEntityResponse({
+    description: HttpErrors.UNPROCESSABLE_ENTITY,
+    type: ActivatingAccountUnprocessableEntityResponse,
+  })
+  @ApiNotFoundResponse({
+    description: HttpErrors.NOT_FOUND,
+    type: AcceptInvitationNotFoundResponse
+  })
+  @ApiInternalServerErrorResponse({
+    description: HttpErrors.INTERNAL_SERVER_ERROR,
+    type: InternalServerErrorWithMessage,
+  })
+  async registerAndAcceptInvitation(@Req() req: RequestWithUser, @Body() body: RegisterByInvitationDto): Promise<MeInterface> {
+    const user = req.user;
     delete user.password;
     return user;
   }
