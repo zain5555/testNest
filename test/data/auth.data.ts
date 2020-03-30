@@ -2,8 +2,7 @@ import { defaultPlan } from '../../src/common/constants';
 
 export const populatedUser = {
   _id: '5e7be8472a863904a7cee170',
-  firstName: 'Afzaal',
-  lastName: 'Ahmad',
+  fullName: 'Afzaal Ahmad',
   password: '$2b$10$v1I5Ptq0g4SuWC0VDtsIEe9DgJ9ti77zIbNuYwpt8CKfdS7C2mpbO',
   avatar: 'image.png',
   isActive: true,
@@ -29,8 +28,7 @@ export const populatedUser = {
 
 export const user = {
   _id: '5e7be8472a863904a7cee170',
-  firstName: 'Afzaal',
-  lastName: 'Ahmad',
+  fullName: 'Afzaal Ahmad',
   password: '$2b$10$v1I5Ptq0g4SuWC0VDtsIEe9DgJ9ti77zIbNuYwpt8CKfdS7C2mpbO',
   avatar: 'image.png',
   isActive: true,

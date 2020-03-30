@@ -38,20 +38,16 @@ export class AuthService {
     const email: string = registerInfo.email.trim().toLowerCase();
     const existingUser: UserInterface = await this.userService.findOneWhere({ email });
     if (existingUser && existingUser.isActive) {
-      if (registerByInvitation) {
-        return existingUser;
-      }
       throw new ConflictException({
         statusCode: HttpStatus.CONFLICT,
         error: HttpErrors.CONFLICT,
-        message: ErrorMessages.EMAIL_ALREADY_EXISTS,
+        message: registerByInvitation ? ErrorMessages.LOGIN_TO_ACCEPT_INVITE : ErrorMessages.EMAIL_ALREADY_EXISTS,
       });
     }
     const newUser: UserInterface = {
       email: registerInfo.email.trim().toLowerCase(),
       password: bcrypt.hashSync(registerInfo.password, 10),
-      firstName: startCase(registerInfo.firstName.trim()),
-      lastName: startCase(registerInfo.lastName.trim()),
+      fullName: startCase(registerInfo.firstName.trim()) + ' ' + startCase(registerInfo.lastName.trim()),
     };
     if (!registerByInvitation) {
       let session;

@@ -37,8 +37,7 @@ describe('UserService', () => {
   it('should return inserted user', async () => {
     mockingoose(userModel).toReturn(user, 'save');
     const insertedUser = await service.insertOne({
-      firstName: user.firstName,
-      lastName: user.lastName,
+      fullName: user.fullName,
       email: user.email,
       password: user.password,
       isEmailVerified: true,
@@ -56,8 +55,7 @@ describe('UserService', () => {
     mockingoose(userModel).toReturn(Error('e'), 'save');
     try {
       await service.insertOne({
-        firstName: user.firstName,
-        lastName: user.lastName,
+        fullName: user.fullName,
         email: user.email,
         password: user.password,
         isEmailVerified: true,
@@ -76,10 +74,7 @@ describe('UserService', () => {
   it('should return updated user', async () => {
     mockingoose(userModel).toReturn(user, 'findOneAndUpdate');
     const updatedUser = await service.findOneAndUpdateWhere({
-      _id: user._id,
-    }, {
-      firstName: user.firstName,
-      lastName: user.lastName,
+      fullName: user.fullName,
       email: user.email,
       password: user.password,
       isEmailVerified: true,
@@ -89,6 +84,8 @@ describe('UserService', () => {
         company: company._id,
         role: RolesEnum.MANAGER,
       }],
+    }, {
+      _id: user._id,
     });
     expect(JSON.parse(JSON.stringify(updatedUser))).toMatchObject(user);
   });
@@ -97,10 +94,7 @@ describe('UserService', () => {
     mockingoose(userModel).toReturn(Error('e'), 'findOneAndUpdate');
     try {
       await service.findOneAndUpdateWhere({
-        _id: user._id,
-      }, {
-        firstName: user.firstName,
-        lastName: user.lastName,
+        fullName: user.fullName,
         email: user.email,
         password: user.password,
         isEmailVerified: true,
@@ -110,6 +104,8 @@ describe('UserService', () => {
           company: company._id,
           role: RolesEnum.MANAGER,
         }],
+      }, {
+        _id: user._id,
       });
     } catch (e) {
       expect(e.message).toMatchObject(defaultInternalServerErrorResponse);
