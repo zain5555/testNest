@@ -72,6 +72,7 @@ export class AuthService {
           }],
         }, { _id: newCompany._id }, { session });
         await session.commitTransaction();
+        this.mailGunHelper.signUpEmail(insertedUser.email, insertedUser.fullName, newCompany.name);
         return insertedUser;
       } catch (e) {
         console.warn(e);
@@ -94,7 +95,7 @@ export class AuthService {
     };
     const jwt = await this.stringHelper.signPayload(activationObject, email);
     console.log(jwt);
-    // ToDo: send activation link to email
+    this.mailGunHelper.activateEmail(jwt, user.email, user.fullName);
     return true;
   }
   

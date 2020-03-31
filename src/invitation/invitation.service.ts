@@ -21,12 +21,14 @@ import { ErrorMessages, HttpErrors, ResponseMessages } from '../common/errors';
 import { UserService } from '../user/user.service';
 import { UserInterface } from '../schema/user.schema';
 import { AddInvitationResponseInterface, InsertedInvitationsInterface, InvitationJwtInterface } from './types/interfaces/invitation.interface';
+import { MailGunHelper } from '../helper/mailgun.helper';
 
 @Injectable()
 export class InvitationService {
   constructor(
     @InjectModel('Invitation') private readonly invitationModel: Model<InvitationInterface>,
     private readonly stringHelper: StringHelper,
+    private readonly mailGunHelper: MailGunHelper,
     @Inject(forwardRef(() => CompanyService))
     private readonly companyService: CompanyService,
     @Inject(forwardRef(() => UserService))
@@ -151,7 +153,7 @@ export class InvitationService {
           email: invitation._doc.email,
           message: ResponseMessages.INVITED_SUCCESSFULLY.replace('?', invitation._doc.email),
         });
-        this.sendInvitationLink(invitation._doc._id, null, invitation._doc, company);
+        this.sendInvitationLink(invitation._doc._id, user, invitation._doc, company);
       }
     }
     return response;
@@ -249,8 +251,8 @@ export class InvitationService {
     return this.fetchInvitationDetails(invitation.invitationId, invitation.email);
   }
   
-  async sendInvitationLink(invitationId: string, user?: MeInterface, invitation?: InvitationInterface, company?: CompanyInterface): Promise<boolean> {
-    if (!invitation && !company && user) {
+  async sendInvitationLink(invitationId: string, user: MeInterface, invitation?: InvitationInterface, company?: CompanyInterface): Promise<boolean> {
+    if (!invitation && !company) {
       invitation = await this.fetchInvitationDetails(invitationId);
       company = await this.companyService.getIfCompanyExistsAndIAmManager(invitation.company, user._id);
     }
@@ -263,7 +265,7 @@ export class InvitationService {
       },
     }, invitation.email);
     console.log(jwt);
-    // ToDo: send email here
+    this.mailGunHelper.inviteEmail(jwt, invitation.email, invitation.email.split('@')[0], user.fullName);
     return true;
   }
 }
