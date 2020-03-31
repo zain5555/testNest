@@ -50,3 +50,24 @@ export const defaultPlan = {
 export const enum StrategyNames {
   REGISTER_STRATEGY = 'register'
 }
+
+export const emailDomain = 'mail.trytouchdown.com';
+
+export const numberOfEmailRetries = 3;
+
+export enum activationEmail {
+  FROM = 'noreply@trytouchdown.com',
+  SUBJECT = 'Touchdown! Activate your account',
+  TITLE = 'Touchdown'
+}
+
+export enum invitationEmail {
+  FROM = 'noreply@trytouchdown.com',
+  SUBJECT = 'Touchdown! Welcome to touchdown!',
+  TITLE = 'Touchdown'
+}
+export enum signUpEmailData {
+  FROM = 'noreply@trytouchdown.com',
+  SUBJECT = 'Touchdown! Welcome to touchdown!',
+  TITLE = 'Touchdown'
+}

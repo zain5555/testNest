@@ -12,6 +12,7 @@ import { ErrorMessages, HttpErrors } from '../common/errors';
 import { RolesEnum } from '../common/constants';
 import { CompanyInterface } from '../schema/company.schema';
 import { StringHelper } from '../helper/string.helper';
+import { MailGunHelper } from '../helper/mailgun.helper';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly companyService: CompanyService,
     private readonly stringHelper: StringHelper,
+    private readonly mailGunHelper: MailGunHelper,
   ) {
   }
   

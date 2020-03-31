@@ -28,6 +28,7 @@ export class ConfigService {
       JWT_SECRET: Joi.string().required(),
       REDIS_URI: Joi.string().required(),
       FRONTEND_APP_URI: Joi.string().uri().required(),
+      MAILGUN_API_KEY: Joi.string().required(),
     });
 
     const { error, value: validatedEnvConfig } = envVarsSchema.validate(
@@ -65,5 +66,9 @@ export class ConfigService {
   
   get frontendAppUri(): string {
     return this.envConfig.FRONTEND_APP_URI;
+  }
+  
+  get mailGunApiKey(): string {
+    return this.envConfig.MAILGUN_API_KEY;
   }
 }
