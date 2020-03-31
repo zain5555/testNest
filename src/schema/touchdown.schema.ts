@@ -18,10 +18,11 @@ export const TouchdownSchema = new mongoose.Schema({
   primaryMetric: { type: String },
   goals: { type: [GoalsSchema] },
   description: { type: String, required: true },
-  previousGoals: { type: [GoalsSchema] },
+  previousTouchdown: { type: mongoose.Schema.ObjectId, ref: 'Touchdown', required: true },
   ratingsAndComments: { type: [RatingAndCommentSchema] },
   startDate: { type: Date, required: true },
-  
+  createdBy: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
+  company: { type: mongoose.Schema.ObjectId, ref: 'Company', required: true },
 }, {
   timestamps: true,
   autoCreate: true,
@@ -46,7 +47,7 @@ export interface TouchdownInterface {
   primaryMetric: string;
   goals: GoalsInterface[];
   description: string;
-  previousGoals: GoalsInterface[];
+  previousTouchdown: string;
   ratingsAndComments: RatingAndCommentInterface[];
   createdAt?: string;
   updatedAt?: string;
