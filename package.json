@@ -21,8 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "pre-commit": [
-    "lint",
-    "test"
+    "lint"
   ],
   "dependencies": {
     "@hapi/joi": "^17.1.1",
@@ -40,6 +39,7 @@
     "connect-mongodb-session": "^2.3.1",
     "dotenv": "^8.2.0",
     "express-session": "^1.17.0",
+    "handlebars": "^4.7.3",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
@@ -54,7 +54,8 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",
-    "swagger-ui-express": "^4.1.4"
+    "swagger-ui-express": "^4.1.4",
+    "ts-mailgun": "^0.4.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^6.9.0",

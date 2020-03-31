@@ -7,6 +7,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ErrorMessages, HttpErrors } from '../common/errors';
 import { defaultInternalServerErrorResponse } from '../common/responses';
 import { StringHelper } from '../helper/string.helper';
+import { MailGunHelper } from '../helper/mailgun.helper';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -39,6 +40,10 @@ describe('AuthService', () => {
         },
         {
           provide: StringHelper,
+          useValue: {},
+        },
+        {
+          provide: MailGunHelper,
           useValue: {},
         },
       ],

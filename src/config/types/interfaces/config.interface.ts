@@ -5,4 +5,5 @@ export interface ConfigInterface {
   JWT_SECRET: string;
   REDIS_URI: string;
   FRONTEND_APP_URI: string;
+  MAILGUN_API_KEY: string;
 }
