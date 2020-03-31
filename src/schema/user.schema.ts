@@ -12,8 +12,7 @@ const SubCompanySchema = new mongoose.Schema({
 
 export const UserSchema = new mongoose.Schema(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    fullName: { type: String, required: true },
     avatar: { type: String, default: '' },
     email: { type: String, index: { unique: true }, required: true },
     password: { type: String, required: false },
@@ -39,8 +38,7 @@ export interface SubCompanyInterface {
 
 export interface UserInterface {
   _id?: string;
-  firstName?: string;
-  lastName?: string;
+  fullName?: string;
   avatar?: string;
   email?: string;
   password?: string;
