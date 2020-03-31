@@ -14,8 +14,7 @@ interface SubCompanyInterface {
 
 export interface MeInterface {
   _id?: string;
-  firstName?: string;
-  lastName?: string;
+  fullName: string;
   avatar?: string;
   email?: string;
   password?: string;

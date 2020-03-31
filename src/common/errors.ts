@@ -30,6 +30,7 @@ export enum ErrorMessages {
   INVALID_JWT = 'Invalid jwt token!',
   REGISTER_FIRST = 'Please sign up first to activate your account!',
   ALREADY_VERIFIED = 'Your account is already activated!',
+  LOGIN_TO_ACCEPT_INVITE = 'You already have an account! Please login to accept an invite!'
 }
 
 export const enum ResponseMessages {

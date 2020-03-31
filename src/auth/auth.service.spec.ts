@@ -75,8 +75,8 @@ describe('AuthService', () => {
     expect(await service.register({
       companyName: company.name,
       email: populatedUser.email,
-      lastName: populatedUser.lastName,
-      firstName: populatedUser.firstName,
+      lastName: populatedUser.fullName.split(' ')[1],
+      firstName: populatedUser.fullName.split(' ')[0],
       password: 'touchdowndemo',
       avatar: '',
     }, false)).toMatchObject(user);
@@ -87,8 +87,8 @@ describe('AuthService', () => {
       await service.register({
         companyName: company.name,
         email: populatedUser.email,
-        lastName: populatedUser.lastName,
-        firstName: populatedUser.firstName,
+        lastName: populatedUser.fullName.split(' ')[1],
+        firstName: populatedUser.fullName.split(' ')[0],
         password: 'touchdowndemo',
         avatar: '',
       }, false);
@@ -110,8 +110,8 @@ describe('AuthService', () => {
       await service.register({
         companyName: company.name,
         email: populatedUser.email,
-        lastName: populatedUser.lastName,
-        firstName: populatedUser.firstName,
+        lastName: populatedUser.fullName.split(' ')[1],
+        firstName: populatedUser.fullName.split(' ')[0],
         password: 'touchdowndemo',
         avatar: '',
       }, false);
