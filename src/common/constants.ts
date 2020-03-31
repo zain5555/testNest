@@ -71,3 +71,11 @@ export enum signUpEmailData {
   SUBJECT = 'Touchdown! Welcome to touchdown!',
   TITLE = 'Touchdown'
 }
+
+export const goalsStatus = ['InComplete','InProgress', 'Done'];
+
+export enum GoalStatus {
+  IN_COMPLETE = 'InComplete',
+  IN_PROGRESS = 'InProgress',
+  DONE = 'DONE'
+}
