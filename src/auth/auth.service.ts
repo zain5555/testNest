@@ -24,8 +24,8 @@ export class AuthService {
   ) {
   }
   
-  async validateUser(credentials: LoginDto): Promise<MeInterface | undefined> {
-    const user: MeInterface = await this.userService.findOneWherePopulated({ email: credentials.email });
+  async validateUser(credentials: LoginDto): Promise<UserInterface | undefined> {
+    const user: UserInterface = await this.userService.findOneWhere({ email: credentials.email });
     if (user && user.password && user.isActive && bcrypt.compareSync(credentials.password, user.password)) {
       return user;
     }
@@ -34,6 +34,10 @@ export class AuthService {
   
   async getUser(userId: string): Promise<MeInterface> {
     return await this.userService.findOneByIdPopulated(userId);
+  }
+  
+  async getUnpopulatedUser(userId: string): Promise<UserInterface> {
+    return await this.userService.findOneById(userId);
   }
   
   async register(registerInfo: RegisterInterface, registerByInvitation: boolean): Promise<UserInterface> {
@@ -94,7 +98,6 @@ export class AuthService {
       email,
     };
     const jwt = await this.stringHelper.signPayload(activationObject, email);
-    console.log(jwt);
     this.mailGunHelper.activateEmail(jwt, user.email, user.fullName);
     return true;
   }

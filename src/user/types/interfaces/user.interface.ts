@@ -24,3 +24,20 @@ export interface MeInterface {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface GetAllCompanyJoinedUsersInterface{
+  userId: string;
+  fullName: string;
+  email: string;
+}
+
+export interface GetAllCompanyInvitedUsersInterface{
+  invitationId: string;
+  fullName: string;
+  email: string;
+}
+
+export interface GetAllCompanyUsersInterface {
+  joinedUsers: Array<GetAllCompanyJoinedUsersInterface>;
+  invitedUsers: Array<GetAllCompanyInvitedUsersInterface>;
+}

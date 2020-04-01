@@ -1,10 +1,10 @@
 import { Request } from 'express';
-import { MeInterface } from '../user/types/interfaces/user.interface';
+import { UserInterface } from '../schema/user.schema';
 
 export interface RequestWithUser extends Request {
-  user?: MeInterface;
+  user?: UserInterface;
   
-  logIn(user: MeInterface): void;
+  logIn(user: UserInterface): void;
 }
 
 export interface QueryUpdateInterface {

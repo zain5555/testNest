@@ -43,8 +43,8 @@ export class AuthController {
     description: HttpErrors.INTERNAL_SERVER_ERROR,
     type: InternalServerErrorWithMessage,
   })
-  async login(@Req() request: RequestWithUser, @Body() credentials: LoginDto): Promise<MeInterface> {
-    const user = request.user;
+  async login(@Req() req: RequestWithUser, @Body() credentials: LoginDto): Promise<MeInterface> {
+    const user = await this.authService.getUser(req.user._id);
     delete user.password;
     return user;
   }
@@ -56,7 +56,7 @@ export class AuthController {
     description: HttpErrors.INTERNAL_SERVER_ERROR,
     type: InternalServerErrorWithMessage,
   })
-  async register(@Req() request: RequestWithUser, @Body() body: RegisterDto): Promise<boolean> {
+  async register(@Body() body: RegisterDto): Promise<boolean> {
     const user: UserInterface = await this.authService.register(body, false);
     return await this.authService.sendActivationLink(user.email, user);
   }
@@ -88,7 +88,7 @@ export class AuthController {
     type: InternalServerErrorWithMessage,
   })
   async verifyMe(@Req() req: RequestWithUser, @Body() body: JwtDto): Promise<MeInterface> {
-    const user = req.user;
+    const user = await this.authService.getUser(req.user._id);
     delete user.password;
     return user;
   }
@@ -109,7 +109,7 @@ export class AuthController {
     type: InternalServerErrorWithMessage,
   })
   async registerAndAcceptInvitation(@Req() req: RequestWithUser, @Body() body: RegisterByInvitationDto): Promise<MeInterface> {
-    const user = req.user;
+    const user = await this.authService.getUser(req.user._id);
     delete user.password;
     return user;
   }

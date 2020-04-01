@@ -1,10 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 import { NodeMailgun } from 'ts-mailgun/ts-mailgun';
-import { activationEmail, emailDomain, invitationEmail, numberOfEmailRetries, signUpEmailData } from '../common/constants';
+import {
+  activationEmail,
+  emailDomain,
+  invitationEmail,
+  newFeedbackEmailData,
+  newTouchdownEmailData,
+  numberOfEmailRetries,
+  signUpEmailData,
+} from '../common/constants';
 import activateEmailTemplate from '../common/emails/activate.template';
 import inviteEmailTemplate from '../common/emails/invite.template';
 import signUpEmailTemplate from '../common/emails/signup.template';
+import newTouchdownEmailTemplate from '../common/emails/new-touchdown.template';
+import newFeedbackEmailTemplate from '../common/emails/new-feedback.template';
 
 @Injectable()
 export class MailGunHelper {
@@ -77,6 +87,50 @@ export class MailGunHelper {
     }).catch(async (e) => {
       console.warn(e);
       await this.signUpEmail(toEmail, name, companyName, emailRetries);
+    });
+  }
+  
+  async newTouchdownEmail(toEmail: string, receiverName: string, touchdownCreator: string, touchdownId: string, companyName: string, emailRetries: number = numberOfEmailRetries): Promise<boolean> {
+    
+    emailRetries --;
+    if (emailRetries <= 0) {
+      return Promise.resolve(false);
+    }
+    
+    this.mailGunClient.fromEmail = newTouchdownEmailData.FROM;
+    this.mailGunClient.fromTitle = newTouchdownEmailData.TITLE;
+    
+    this.mailGunClient.init();
+    
+    const touchdownLink = `${this.configService.frontendAppUri}/touchdown/${touchdownId}`;
+    
+    this.mailGunClient.send(toEmail, newTouchdownEmailData.SUBJECT, newTouchdownEmailTemplate(receiverName, touchdownCreator, companyName, touchdownLink)).then((response) => {
+      return Promise.resolve(true);
+    }).catch(async (e) => {
+      console.warn(e);
+      await this.newTouchdownEmail(toEmail, receiverName, touchdownCreator, touchdownId, companyName, emailRetries);
+    });
+  }
+  
+  async newFeedbackEmail(toEmail: string, receiverName: string, touchdownId: string, companyName: string, emailRetries: number = numberOfEmailRetries): Promise<boolean> {
+    
+    emailRetries --;
+    if (emailRetries <= 0) {
+      return Promise.resolve(false);
+    }
+    
+    this.mailGunClient.fromEmail = newFeedbackEmailData.FROM;
+    this.mailGunClient.fromTitle = newFeedbackEmailData.TITLE;
+    
+    this.mailGunClient.init();
+    
+    const touchdownLink = `${this.configService.frontendAppUri}/touchdown/${touchdownId}`;
+    
+    this.mailGunClient.send(toEmail, newFeedbackEmailData.SUBJECT, newFeedbackEmailTemplate(receiverName, companyName, touchdownLink)).then((response) => {
+      return Promise.resolve(true);
+    }).catch(async (e) => {
+      console.warn(e);
+      await this.newFeedbackEmail(toEmail, receiverName, touchdownId, companyName, emailRetries);
     });
   }
 }

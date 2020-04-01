@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { CompanyModule } from './company/company.module';
 import { InvitationModule } from './invitation/invitation.module';
 import { HelperModule } from './helper/helper.module';
+import { TouchdownModule } from './touchdown/touchdown.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HelperModule } from './helper/helper.module';
     CompanyModule,
     InvitationModule,
     HelperModule,
+    TouchdownModule,
   ],
   controllers: [AppController],
   providers: [AppService],
