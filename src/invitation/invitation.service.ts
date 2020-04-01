@@ -91,7 +91,7 @@ export class InvitationService {
     }
   }
   
-  async invite(companyId: string, emails: string[], user: MeInterface): Promise<AddInvitationResponseInterface[]> {
+  async invite(companyId: string, emails: string[], user: UserInterface): Promise<AddInvitationResponseInterface[]> {
     const company: CompanyInterface = await this.companyService.getIfCompanyExistsAndIAmManager(companyId, user._id);
     const existingUsers: UserInterface[] = await this.userService.findAllWhere({
       email: {
@@ -131,7 +131,7 @@ export class InvitationService {
         });
         continue;
       }
-      if (company?.users?.length + existingInvitationsOfCompany?.length + newInvitations.length >= company.subscription.maxUsers) {
+      if (company.subscription.maxUsers && company?.users?.length + existingInvitationsOfCompany?.length + newInvitations.length >= company.subscription.maxUsers) {
         response.push({
           invitationId: null,
           message: ErrorMessages.MAX_USER_LIMIT_REACHED,
@@ -191,7 +191,7 @@ export class InvitationService {
     return invitation;
   }
   
-  async acceptInvitation(invitationId: string, user: MeInterface): Promise<boolean> {
+  async acceptInvitation(invitationId: string, user: UserInterface): Promise<boolean> {
     const invitation: InvitationInterface = await this.fetchInvitationDetails(invitationId, user.email);
     return this.acceptMyInvite(invitation, user._id);
   }
@@ -251,7 +251,7 @@ export class InvitationService {
     return this.fetchInvitationDetails(invitation.invitationId, invitation.email);
   }
   
-  async sendInvitationLink(invitationId: string, user: MeInterface, invitation?: InvitationInterface, company?: CompanyInterface): Promise<boolean> {
+  async sendInvitationLink(invitationId: string, user: UserInterface, invitation?: InvitationInterface, company?: CompanyInterface): Promise<boolean> {
     if (!invitation && !company) {
       invitation = await this.fetchInvitationDetails(invitationId);
       company = await this.companyService.getIfCompanyExistsAndIAmManager(invitation.company, user._id);
@@ -264,7 +264,6 @@ export class InvitationService {
         name: company.name,
       },
     }, invitation.email);
-    console.log(jwt);
     this.mailGunHelper.inviteEmail(jwt, invitation.email, invitation.email.split('@')[0], user.fullName);
     return true;
   }

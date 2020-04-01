@@ -11,7 +11,7 @@ export class HelperModule {
   static forRoot(): DynamicModule {
     return {
       module: HelperModule,
-      exports: [StringHelper],
+      exports: [StringHelper, MailGunHelper],
     };
   }
 }

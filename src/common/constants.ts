@@ -31,13 +31,13 @@ export const plans = {
     name: 'trial',
     pricePerUser: 0,
     billingCycleDays: 49,
-    maxUsers: 4,
+    maxUsers: 0,
   },
   basic: {
-    name: 'basic',
-    pricePerUser: 5,
+    name: 'pro',
+    pricePerUser: 4,
     billingCycleDays: 30,
-    maxUsers: 10,
+    maxUsers: 0,
   },
 };
 
@@ -71,6 +71,16 @@ export enum signUpEmailData {
   SUBJECT = 'Touchdown! Welcome to touchdown!',
   TITLE = 'Touchdown'
 }
+export enum newTouchdownEmailData {
+  FROM = 'noreply@trytouchdown.com',
+  SUBJECT = 'New Touchdown!',
+  TITLE = 'Touchdown'
+}
+export enum newFeedbackEmailData {
+  FROM = 'noreply@trytouchdown.com',
+  SUBJECT = 'New Feedback!',
+  TITLE = 'Touchdown'
+}
 
 export const goalsStatus = ['InComplete','InProgress', 'Done'];
 
@@ -78,4 +88,10 @@ export enum GoalStatus {
   IN_COMPLETE = 'InComplete',
   IN_PROGRESS = 'InProgress',
   DONE = 'DONE'
+}
+
+export const defaultTouchDownTimeInDays = 7;
+
+export enum DefaultPaginationLimits {
+  TOUCHDOWN = 10
 }

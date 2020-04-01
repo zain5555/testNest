@@ -221,7 +221,7 @@ export class GenericBadRequestResponseForIdCheck extends BadRequest {
   message: GenericBadRequestMessage[];
 }
 
-export class DefaultForbiddenResponseDoc {
+export class DefaultForbiddenResponse {
   @ApiProperty({ example: HttpStatus.FORBIDDEN })
   statusCode: number;
   

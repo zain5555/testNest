@@ -30,7 +30,12 @@ export enum ErrorMessages {
   INVALID_JWT = 'Invalid jwt token!',
   REGISTER_FIRST = 'Please sign up first to activate your account!',
   ALREADY_VERIFIED = 'Your account is already activated!',
-  LOGIN_TO_ACCEPT_INVITE = 'You already have an account! Please login to accept an invite!'
+  LOGIN_TO_ACCEPT_INVITE = 'You already have an account! Please login to accept an invite!',
+  TOUCHDOWN_NOT_FOUND = 'Touchdown Not Found!',
+  TOUCHDOWN_INSERTION_NOT_ALLOWED = 'Your previous touchdown is still active!',
+  LAST_TOUCHDOWN_NOT_FOUND = 'No Previous Touchdown Found!',
+  CANNOT_UPDATE_COMMENT = 'You cannot update your comment and rating after sending it!',
+  CANNOT_LEAVE_COMMENT_ON_YOUR_OWN_TOUCHDOWN = 'You cannot leave comment on your own touchdown!'
 }
 
 export const enum ResponseMessages {

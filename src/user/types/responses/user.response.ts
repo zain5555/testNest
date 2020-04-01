@@ -22,7 +22,7 @@ export class PopulatedCompaniesResponse {
   @ApiProperty({ example: true })
   creator: boolean;
   
-  @ApiProperty({ example: 'manager', enum: roles})
+  @ApiProperty({ example: 'manager', enum: roles })
   role: string;
   
   @ApiProperty({ example: '2020-03-25T23:24:55.318Z' })
@@ -62,5 +62,52 @@ export class MeResponse {
   
   @ApiProperty({ example: '2020-03-25T23:24:55.318Z' })
   updatedAt: string;
+}
+
+export class GetAllCompanyJoinedUsersResponse {
+  @ApiProperty({
+    example: '5e83c8a58936cb16c3ca93c5'
+  })
+  userId: string;
   
+  @ApiProperty({
+    example: 'Afzaal Ahmad'
+  })
+  fullName: string;
+  
+  @ApiProperty({
+    example: 'afzaal@creativemorph.com'
+  })
+  email: string;
+}
+
+export class GetAllCompanyInvitedUsersResponse {
+  @ApiProperty({
+    example: '5e83c8a58936cb16c3ca93c5'
+  })
+  invitationId: string;
+  
+  @ApiProperty({
+    example: 'afzaal'
+  })
+  fullName: string;
+  
+  @ApiProperty({
+    example: 'afzaal@creativemorph.com'
+  })
+  email: string;
+}
+
+export class GetAllCompanyUsersResponse {
+  @ApiProperty({
+    type: GetAllCompanyJoinedUsersResponse,
+    isArray: true,
+  })
+  joinedUsers: GetAllCompanyJoinedUsersResponse;
+  
+  @ApiProperty({
+    type: GetAllCompanyInvitedUsersResponse,
+    isArray: true,
+  })
+  invitedUsers: GetAllCompanyInvitedUsersResponse;
 }
