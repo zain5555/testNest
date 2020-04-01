@@ -28,7 +28,7 @@ export class MailGunHelper {
     
     this.mailGunClient.init();
     
-    const activationLink = `${this.configService.frontendAppUri}/verify/${jwt}`;
+    const activationLink = `${this.configService.frontendAppUri}/activate/${jwt}`;
     
     this.mailGunClient.send(toEmail, activationEmail.SUBJECT, activateEmailTemplate(name, activationLink)).then((response) => {
       return Promise.resolve(true);
