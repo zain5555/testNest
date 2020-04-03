@@ -261,7 +261,7 @@ export class TouchdownService {
     }
     const limit = query.limit ?? DefaultPaginationLimits.TOUCHDOWN;
     if (userCompany.role === RolesEnum.MANAGER) {
-      where.user = user._id;
+      where.createdBy = user._id;
     }
     let response: GetAllPaginatedResponseInterface = {
       data: [],
