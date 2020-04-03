@@ -90,7 +90,7 @@ export enum GoalStatus {
   DONE = 'DONE'
 }
 
-export const defaultTouchDownTimeInDays = 7;
+export const defaultTouchDownTimeInDays = -1;
 
 export enum DefaultPaginationLimits {
   TOUCHDOWN = 10

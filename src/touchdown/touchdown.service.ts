@@ -217,7 +217,7 @@ export class TouchdownService {
       description: touchdown.description,
       goals: touchdown.goals,
       isActive: touchdown.isActive,
-      previousGoals: touchdown.previousTouchdown.goals,
+      previousGoals: touchdown?.previousTouchdown?.goals || [],
       startDate: touchdown.startDate,
       ratingsAndComments: userCompany.role === RolesEnum.MANAGER && user._id.toString() === touchdown.createdBy._id.toString() ? touchdown.ratingsAndComments.map(obj => {
         return {
