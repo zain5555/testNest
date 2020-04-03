@@ -141,7 +141,7 @@ export class TouchdownService {
       },
     });
     for (const employee of allEmployees) {
-      this.mailGunHelper.newTouchdownEmail(employee.email, employee.fullName, userName, touchdown._id.toString(), company.name);
+      this.mailGunHelper.newTouchdownEmail(employee.email, employee.fullName, userName, touchdown._id.toString(), company.name, company._id.toString());
     }
     return true;
   }
@@ -164,7 +164,7 @@ export class TouchdownService {
     if (!company || !user || !user.isActive || !user.isEmailVerified) {
       return false;
     }
-    this.mailGunHelper.newFeedbackEmail(user.email, user.fullName, touchdownId, company.name);
+    this.mailGunHelper.newFeedbackEmail(user.email, user.fullName, touchdownId, company.name, company._id.toString());
     return true;
   }
   

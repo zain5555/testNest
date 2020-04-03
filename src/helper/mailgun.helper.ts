@@ -90,7 +90,7 @@ export class MailGunHelper {
     });
   }
   
-  async newTouchdownEmail(toEmail: string, receiverName: string, touchdownCreator: string, touchdownId: string, companyName: string, emailRetries: number = numberOfEmailRetries): Promise<boolean> {
+  async newTouchdownEmail(toEmail: string, receiverName: string, touchdownCreator: string, touchdownId: string, companyName: string, companyId: string, emailRetries: number = numberOfEmailRetries): Promise<boolean> {
     
     emailRetries --;
     if (emailRetries <= 0) {
@@ -102,17 +102,17 @@ export class MailGunHelper {
     
     this.mailGunClient.init();
     
-    const touchdownLink = `${this.configService.frontendAppUri}/touchdown/${touchdownId}`;
+    const touchdownLink = `${this.configService.frontendAppUri}/touchdown/${companyId}/${touchdownId}`;
     
     this.mailGunClient.send(toEmail, newTouchdownEmailData.SUBJECT, newTouchdownEmailTemplate(receiverName, touchdownCreator, companyName, touchdownLink)).then((response) => {
       return Promise.resolve(true);
     }).catch(async (e) => {
       console.warn(e);
-      await this.newTouchdownEmail(toEmail, receiverName, touchdownCreator, touchdownId, companyName, emailRetries);
+      await this.newTouchdownEmail(toEmail, receiverName, touchdownCreator, touchdownId, companyName, companyId, emailRetries);
     });
   }
   
-  async newFeedbackEmail(toEmail: string, receiverName: string, touchdownId: string, companyName: string, emailRetries: number = numberOfEmailRetries): Promise<boolean> {
+  async newFeedbackEmail(toEmail: string, receiverName: string, touchdownId: string, companyName: string, companyId: string, emailRetries: number = numberOfEmailRetries): Promise<boolean> {
     
     emailRetries --;
     if (emailRetries <= 0) {
@@ -124,13 +124,13 @@ export class MailGunHelper {
     
     this.mailGunClient.init();
     
-    const touchdownLink = `${this.configService.frontendAppUri}/touchdown/${touchdownId}`;
+    const touchdownLink = `${this.configService.frontendAppUri}/touchdown/${companyId}/${touchdownId}`;
     
     this.mailGunClient.send(toEmail, newFeedbackEmailData.SUBJECT, newFeedbackEmailTemplate(receiverName, companyName, touchdownLink)).then((response) => {
       return Promise.resolve(true);
     }).catch(async (e) => {
       console.warn(e);
-      await this.newFeedbackEmail(toEmail, receiverName, touchdownId, companyName, emailRetries);
+      await this.newFeedbackEmail(toEmail, receiverName, touchdownId, companyName, companyId, emailRetries);
     });
   }
 }
