@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDate, IsIn, IsMongoId, IsNotEmpty, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { CompanyIdDto } from '../../../common/dto';
 import { Type } from 'class-transformer';
-import { goalsStatus } from '../../../common/constants';
+import { goalsStatus, listSortingOrders, touchdownSortByOptions } from '../../../common/constants';
 
 export class TouchdownIdDto {
   @ApiProperty({
@@ -25,6 +25,32 @@ export class GetAllPaginatedDto extends CompanyIdDto {
   @Min(0)
   @Max(50)
   readonly limit: number;
+  
+  @ApiPropertyOptional({
+    example: 'createdAt',
+    enum: touchdownSortByOptions
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(touchdownSortByOptions)
+  sortBy: string;
+  
+  @ApiPropertyOptional({
+    example: 'ascending',
+    enum: listSortingOrders
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(listSortingOrders)
+  order: string;
+  
+  @ApiPropertyOptional({
+    example: 'search'
+  })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  search: string;
 }
 
 export class PreviousGoalsDto {
