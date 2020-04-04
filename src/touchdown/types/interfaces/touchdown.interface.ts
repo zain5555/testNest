@@ -46,6 +46,9 @@ export interface GetAllPaginatedQueryInterface {
   companyId: string;
   cursor?: string;
   limit?: number;
+  sortBy?: string;
+  order?: string;
+  search?: string;
 }
 
 export interface GetAllDataInterface {

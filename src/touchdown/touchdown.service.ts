@@ -23,7 +23,14 @@ import {
 } from './types/interfaces/touchdown.interface';
 import { UserInterface } from '../schema/user.schema';
 import { ErrorMessages, HttpErrors } from '../common/errors';
-import { DefaultPaginationLimits, defaultTouchDownTimeInDays, RolesEnum } from '../common/constants';
+import {
+  DefaultPaginationLimits,
+  defaultTouchdownSortBy,
+  defaultTouchdownSortOrder,
+  defaultTouchDownTimeInDays,
+  RolesEnum,
+  SortOrder,
+} from '../common/constants';
 import { UserService } from '../user/user.service';
 import * as moment from 'moment';
 import { MailGunHelper } from '../helper/mailgun.helper';
@@ -83,9 +90,9 @@ export class TouchdownService {
     }
   }
   
-  async findAllWhere(where: any, limit?: number, projection?: any): Promise<TouchdownInterface[]> {
+  async findAllWhere(where: any, limit: number, sortBy?: any, projection?: any): Promise<TouchdownInterface[]> {
     try {
-      return await this.touchdownModel.find(where).sort('-createdAt').limit(limit).select(projection).lean();
+      return await this.touchdownModel.find(where).sort(sortBy).limit(limit).select(projection).lean();
     } catch (e) {
       console.warn(e);
       throw new InternalServerErrorException(defaultInternalServerErrorResponse);
@@ -187,7 +194,7 @@ export class TouchdownService {
       createdBy: user._id,
       isActive: true,
       company: companyId,
-    }, 1);
+    }, 1, '-createdAt');
     if (previousTouchdown && previousTouchdown.length) {
       return {
         _id: previousTouchdown[0]._id,
@@ -254,10 +261,23 @@ export class TouchdownService {
       company: query.companyId,
       isActive: true,
     };
+    const sortBy = query.sortBy || defaultTouchdownSortBy;
+    const order = query.order
+      ? query.order === SortOrder.ASCENDING ? 1 : -1
+      : defaultTouchdownSortOrder;
+    const sort = {};
+    sort[sortBy] = order;
     if (query.cursor) {
-      where.createdAt = {
-        $lt: query.cursor,
+      where[sortBy] = order === 1 ? {
+        $gt: query.cursor,
+      } : {
+        $lt: query.cursor
       };
+    }
+    if (query.search) {
+      where.$text = {
+        $search: query.search,
+      }
     }
     const limit = query.limit ?? DefaultPaginationLimits.TOUCHDOWN;
     if (userCompany.role === RolesEnum.MANAGER) {
@@ -268,7 +288,7 @@ export class TouchdownService {
       hasMore: false,
       cursor: '',
     };
-    const touchdowns = await this.findAllWhere(where, limit + 1);
+    const touchdowns = await this.findAllWhere(where, limit + 1, sort);
     const touchdownResponse: GetAllDataInterface[] = touchdowns.map(touchdown => ({
       _id: touchdown._id,
       primaryMetric: touchdown.primaryMetric,
@@ -284,7 +304,7 @@ export class TouchdownService {
       touchdownResponse.pop();
       response = {
         data: touchdownResponse,
-        cursor: touchdownResponse[touchdownResponse.length - 1].createdAt,
+        cursor: touchdownResponse[touchdownResponse.length - 1][sortBy],
         hasMore: true,
       };
     } else {

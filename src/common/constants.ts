@@ -90,8 +90,21 @@ export enum GoalStatus {
   DONE = 'DONE'
 }
 
-export const defaultTouchDownTimeInDays = 7;
+export const defaultTouchDownTimeInDays = -1;
 
 export enum DefaultPaginationLimits {
   TOUCHDOWN = 10
 }
+
+export const listSortingOrders = ['ascending', 'descending'];
+
+export enum SortOrder {
+  ASCENDING = 'ascending',
+  DESCENDING = 'descending'
+}
+
+export const touchdownSortByOptions = ['createdAt'];
+
+export const defaultTouchdownSortBy = 'createdAt';
+
+export const defaultTouchdownSortOrder = -1;

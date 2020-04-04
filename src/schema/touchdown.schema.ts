@@ -15,9 +15,9 @@ export const RatingAndCommentSchema = new mongoose.Schema({
 });
 
 export const TouchdownSchema = new mongoose.Schema({
-  primaryMetric: { type: String },
+  primaryMetric: { type: String, required: true },
   goals: { type: [GoalsSchema] },
-  description: { type: String, required: true },
+  description: { type: String },
   previousTouchdown: { type: mongoose.Schema.ObjectId, ref: 'Touchdown'},
   ratingsAndComments: { type: [RatingAndCommentSchema] },
   averageRating: { type: Number, default: 0, min: 0, max: 10 },
@@ -28,6 +28,11 @@ export const TouchdownSchema = new mongoose.Schema({
 }, {
   timestamps: true,
   autoCreate: true,
+});
+
+TouchdownSchema.index({
+  primaryMetric: 'text',
+  description: 'text',
 });
 
 export interface GoalsInterface {
