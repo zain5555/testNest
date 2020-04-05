@@ -1,9 +1,16 @@
-import { ConflictException, HttpStatus, Injectable, InternalServerErrorException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './types/dto/auth.dto';
 import { MeInterface } from '../user/types/interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
-import { ActivationJwtInterface, RegisterInterface, RegisterUserInterface } from './types/interfaces/auth.interface';
+import { ActivationJwtInterface, RegisterInterface, RegisterUserInterface, ResetPasswordPayload } from './types/interfaces/auth.interface';
 import { defaultInternalServerErrorResponse } from '../common/responses';
 import { CompanyService } from '../company/company.service';
 import { startCase } from 'lodash';
@@ -149,6 +156,49 @@ export class AuthService {
       });
     }
     return true;
+  }
+  
+  async forgotPassword(email: string): Promise<boolean> {
+    const user = await this.userService.findOneWhere({ email, isActive: true });
+    if (!user) {
+      throw new NotFoundException({
+        statusCode: HttpStatus.NOT_FOUND,
+        error: HttpErrors.NOT_FOUND,
+        message: ErrorMessages.USER_NOT_FOUND,
+      });
+    }
+    const jwt: string = await this.stringHelper.signPayload({
+      email: user.email,
+    }, user._id.toString());
+    this.mailGunHelper.forgotPasswordEmail(jwt, user.email, user.fullName);
+    return true;
+  }
+  
+  async resetPassword(data: ResetPasswordPayload): Promise<any> {
+    let jwtData: { email: string };
+    try {
+      jwtData = await this.stringHelper.verifyPayload(data.jwt) as unknown as { email: string };
+      if (!jwtData || !jwtData.email) {
+        throw new Error('Invalid Token!');
+      }
+    } catch (e) {
+      console.warn(e);
+      throw new UnprocessableEntityException({
+        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        error: HttpErrors.UNPROCESSABLE_ENTITY,
+        message: e?.message || ErrorMessages.INVALID_JWT,
+      });
+    }
+    const password = bcrypt.hashSync(data.password, 10);
+    return await this.userService.findOneAndUpdateWhere({
+      password,
+      isEmailVerified: true,
+    }, {
+      email: jwtData.email,
+    }, {
+      lean: true,
+      new: true
+    });
   }
   
 }

@@ -3,7 +3,7 @@ import { ConfigService } from '../config/config.service';
 import { NodeMailgun } from 'ts-mailgun/ts-mailgun';
 import {
   activationEmail,
-  emailDomain,
+  emailDomain, forgotPasswordEmailData,
   invitationEmail,
   newFeedbackEmailData,
   newTouchdownEmailData,
@@ -15,6 +15,7 @@ import inviteEmailTemplate from '../common/emails/invite.template';
 import signUpEmailTemplate from '../common/emails/signup.template';
 import newTouchdownEmailTemplate from '../common/emails/new-touchdown.template';
 import newFeedbackEmailTemplate from '../common/emails/new-feedback.template';
+import forgotPasswordEmailTemplate from '../common/emails/forgot-password.template';
 
 @Injectable()
 export class MailGunHelper {
@@ -131,6 +132,28 @@ export class MailGunHelper {
     }).catch(async (e) => {
       console.warn(e);
       await this.newFeedbackEmail(toEmail, receiverName, touchdownId, companyName, companyId, emailRetries);
+    });
+  }
+  
+  async forgotPasswordEmail(jwt: string, toEmail: string, name: string, emailRetries: number = numberOfEmailRetries): Promise<boolean> {
+    
+    emailRetries --;
+    if (emailRetries <= 0) {
+      return Promise.resolve(false);
+    }
+    
+    this.mailGunClient.fromEmail = forgotPasswordEmailData.FROM;
+    this.mailGunClient.fromTitle = forgotPasswordEmailData.TITLE;
+    
+    this.mailGunClient.init();
+    
+    const resetPasswordLink = `${this.configService.frontendAppUri}/reset/${jwt}`;
+    
+    this.mailGunClient.send(toEmail, forgotPasswordEmailData.SUBJECT, forgotPasswordEmailTemplate(name, resetPasswordLink)).then((response) => {
+      return Promise.resolve(true);
+    }).catch(async (e) => {
+      console.warn(e);
+      await this.forgotPasswordEmail(jwt, toEmail, name, emailRetries);
     });
   }
 }
