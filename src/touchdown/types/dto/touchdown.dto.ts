@@ -13,11 +13,11 @@ export class TouchdownIdDto {
 }
 
 export class GetAllPaginatedDto extends CompanyIdDto {
-  @ApiPropertyOptional({ description: 'cursor', example: '2020-02-11T08:33:05.147Z' })
+  @ApiPropertyOptional({ description: 'how many rows to skip', example: 10 })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  readonly cursor: string;
+  @Type(() => Number)
+  @Min(0)
+  readonly skip: number;
   
   @ApiPropertyOptional({ description: 'limit', example: '20' })
   @IsOptional()
