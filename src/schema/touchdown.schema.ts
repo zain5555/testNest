@@ -33,6 +33,7 @@ export const TouchdownSchema = new mongoose.Schema({
 TouchdownSchema.index({
   primaryMetric: 'text',
   description: 'text',
+  'goals.goal': 'text',
 });
 
 export interface GoalsInterface {

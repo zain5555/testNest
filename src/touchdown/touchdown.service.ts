@@ -8,7 +8,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { TouchdownInterface } from '../schema/touchdown.schema';
 import { defaultForbiddenResponse, defaultInternalServerErrorResponse } from '../common/responses';
 import { QueryFindOneAndUpdateOptionsInterface, QueryGenericOptionsInterface, QueryUpdateInterface } from '../common/interfaces';
@@ -93,6 +93,47 @@ export class TouchdownService {
   async findAllWhere(where: any, limit: number, sortBy?: any, projection?: any): Promise<TouchdownInterface[]> {
     try {
       return await this.touchdownModel.find(where).sort(sortBy).limit(limit).select(projection).lean();
+    } catch (e) {
+      console.warn(e);
+      throw new InternalServerErrorException(defaultInternalServerErrorResponse);
+    }
+  }
+  
+  async findAllAggregation(where: any, limit: number, sortBy?: any): Promise<TouchdownInterface[]> {
+    try {
+      return await this.touchdownModel.aggregate([{
+        $lookup: {
+          from: 'touchdowns',
+          localField: 'previousTouchdown',
+          foreignField: '_id',
+          as: 'previousTouchdown',
+        },
+      }, {
+        $unwind: {
+          path: '$previousTouchdown',
+          preserveNullAndEmptyArrays: true,
+        },
+      }, {
+        $match: where,
+      }, {
+        $sort: sortBy,
+      }, {
+        $limit: limit,
+      }]);
+    } catch (e) {
+      console.warn(e);
+      throw new InternalServerErrorException(defaultInternalServerErrorResponse);
+    }
+  }
+  
+  async findAllWherePopulated(where: any, limit: number, sortBy?: any, projection?: any): Promise<TouchdownInterface[]> {
+    try {
+      return await this.touchdownModel.find(where)
+        .populate('previousTouchdown')
+        .sort(sortBy)
+        .limit(limit)
+        .select(projection)
+        .lean();
     } catch (e) {
       console.warn(e);
       throw new InternalServerErrorException(defaultInternalServerErrorResponse);
@@ -257,8 +298,8 @@ export class TouchdownService {
         message: ErrorMessages.COMPANY_NOT_FOUND,
       });
     }
-    const where: any = {
-      company: query.companyId,
+    let where: any = {
+      company: Types.ObjectId(query.companyId),
       isActive: true,
     };
     const sortBy = query.sortBy || defaultTouchdownSortBy;
@@ -268,27 +309,35 @@ export class TouchdownService {
     const sort = {};
     sort[sortBy] = order;
     if (query.cursor) {
+      const cursor = sortBy === 'createdAt' ? new Date(query.cursor): query.cursor;
       where[sortBy] = order === 1 ? {
-        $gt: query.cursor,
+        $gt: cursor
       } : {
-        $lt: query.cursor
+        $lt: cursor,
       };
     }
     if (query.search) {
-      where.$text = {
-        $search: query.search,
-      }
+      const search = query.search.trim();
+      where = {
+        ...where,
+        $or: [
+          { primaryMetric: { $regex: new RegExp('^' + search), $options: 'imxs', } },
+          { description: { $regex: new RegExp(search), $options: 'imxs', } },
+          { 'goals.goal': { $regex: new RegExp(search), $options: 'imxs', } },
+          { 'previousTouchdown.goals.goal': { $regex: new RegExp(search), $options: 'imxs', } },
+        ],
+      };
     }
     const limit = query.limit ?? DefaultPaginationLimits.TOUCHDOWN;
     if (userCompany.role === RolesEnum.MANAGER) {
-      where.createdBy = user._id;
+      where.createdBy = Types.ObjectId(user._id);
     }
     let response: GetAllPaginatedResponseInterface = {
       data: [],
       hasMore: false,
       cursor: '',
     };
-    const touchdowns = await this.findAllWhere(where, limit + 1, sort);
+    const touchdowns = await this.findAllAggregation(where, limit + 1, sort);
     const touchdownResponse: GetAllDataInterface[] = touchdowns.map(touchdown => ({
       _id: touchdown._id,
       primaryMetric: touchdown.primaryMetric,
