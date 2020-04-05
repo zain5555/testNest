@@ -188,11 +188,6 @@ export class GetAllPaginatedResponse {
   data: GetAllDataResponse[];
   
   @ApiProperty({
-    example: '2020-04-01T11:10:38.104Z',
-  })
-  cursor: string;
-  
-  @ApiProperty({
     example: true,
   })
   hasMore: boolean;

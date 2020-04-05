@@ -99,7 +99,7 @@ export class TouchdownService {
     }
   }
   
-  async findAllAggregation(where: any, limit: number, sortBy?: any): Promise<TouchdownInterface[]> {
+  async findAllAggregation(where: any, limit: number, skip: number, sortBy?: any): Promise<TouchdownInterface[]> {
     try {
       return await this.touchdownModel.aggregate([{
         $lookup: {
@@ -117,6 +117,8 @@ export class TouchdownService {
         $match: where,
       }, {
         $sort: sortBy,
+      }, {
+        $skip: skip,
       }, {
         $limit: limit,
       }]);
@@ -308,14 +310,6 @@ export class TouchdownService {
       : defaultTouchdownSortOrder;
     const sort = {};
     sort[sortBy] = order;
-    if (query.cursor) {
-      const cursor = sortBy === 'createdAt' ? new Date(query.cursor): query.cursor;
-      where[sortBy] = order === 1 ? {
-        $gt: cursor
-      } : {
-        $lt: cursor,
-      };
-    }
     if (query.search) {
       const search = query.search.trim();
       where = {
@@ -329,15 +323,15 @@ export class TouchdownService {
       };
     }
     const limit = query.limit ?? DefaultPaginationLimits.TOUCHDOWN;
+    const skip = query.skip || 0;
     if (userCompany.role === RolesEnum.MANAGER) {
       where.createdBy = Types.ObjectId(user._id);
     }
     let response: GetAllPaginatedResponseInterface = {
       data: [],
       hasMore: false,
-      cursor: '',
     };
-    const touchdowns = await this.findAllAggregation(where, limit + 1, sort);
+    const touchdowns = await this.findAllAggregation(where, limit + 1, skip, sort);
     const touchdownResponse: GetAllDataInterface[] = touchdowns.map(touchdown => ({
       _id: touchdown._id,
       primaryMetric: touchdown.primaryMetric,
@@ -353,7 +347,6 @@ export class TouchdownService {
       touchdownResponse.pop();
       response = {
         data: touchdownResponse,
-        cursor: touchdownResponse[touchdownResponse.length - 1][sortBy],
         hasMore: true,
       };
     } else {

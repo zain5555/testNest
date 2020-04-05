@@ -44,7 +44,7 @@ export interface GetOneTouchdownResponseInterface {
 
 export interface GetAllPaginatedQueryInterface {
   companyId: string;
-  cursor?: string;
+  skip?: number;
   limit?: number;
   sortBy?: string;
   order?: string;
@@ -61,7 +61,6 @@ export interface GetAllDataInterface {
 
 export interface GetAllPaginatedResponseInterface {
   data: GetAllDataInterface[];
-  cursor: string;
   hasMore: boolean;
 }
 
