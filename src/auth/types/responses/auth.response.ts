@@ -24,3 +24,8 @@ export class ActivatingAccountUnprocessableEntityResponse extends UnprocessableE
   @ApiProperty({ example: ErrorMessages.INVALID_JWT })
   message: string;
 }
+
+export class ResetPasswordUPResponse extends UnprocessableEntityResponse {
+  @ApiProperty({ example: ErrorMessages.INVALID_JWT })
+  message: string;
+}

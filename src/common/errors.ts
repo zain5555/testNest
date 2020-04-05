@@ -35,7 +35,8 @@ export enum ErrorMessages {
   TOUCHDOWN_INSERTION_NOT_ALLOWED = 'Your previous touchdown is still active!',
   LAST_TOUCHDOWN_NOT_FOUND = 'No Previous Touchdown Found!',
   CANNOT_UPDATE_COMMENT = 'You cannot update your comment and rating after sending it!',
-  CANNOT_LEAVE_COMMENT_ON_YOUR_OWN_TOUCHDOWN = 'You cannot leave comment on your own touchdown!'
+  CANNOT_LEAVE_COMMENT_ON_YOUR_OWN_TOUCHDOWN = 'You cannot leave comment on your own touchdown!',
+  USER_NOT_FOUND = 'Account with given email doesn\'t exist!'
 }
 
 export const enum ResponseMessages {

@@ -1,3 +1,5 @@
+import { JwtInterface } from '../../../common/interfaces';
+
 export interface CredentialsInterface {
   email: string;
   password: string;
@@ -27,5 +29,9 @@ export interface RegisterUserInterface {
 
 export interface ActivationJwtInterface {
   email: string;
+}
+
+export interface ResetPasswordPayload extends JwtInterface{
+  password: string;
 }
 

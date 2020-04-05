@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CredentialsInterface, RegisterByInvitationInterface, RegisterInterface } from '../interfaces/auth.interface';
+import { CredentialsInterface, RegisterByInvitationInterface, RegisterInterface, ResetPasswordPayload } from '../interfaces/auth.interface';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger/dist/decorators/api-model-property.decorator';
 import { JwtDto } from '../../../common/dto';
 
@@ -146,6 +146,26 @@ export class RegisterByInvitationDto extends JwtDto{
       this.password = data.password;
       this.firstName = data.firstName;
       this.lastName = data.lastName;
+    }
+  }
+}
+
+export class ResetPasswordDto extends JwtDto {
+  @ApiModelProperty({
+    minLength: 8,
+    maxLength: 64,
+    example: 'touchdowndemo',
+  })
+  // validation decorators for password field!
+  @IsString()
+  @Length(8, 64)
+  password: string;
+  
+  constructor(data: ResetPasswordPayload) {
+    super();
+    if(data) {
+      this.jwt = data.jwt;
+      this.password = data.password;
     }
   }
 }

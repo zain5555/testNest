@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { roles } from '../../../common/constants';
+import { NotFound } from '../../../common/responses';
+import { ErrorMessages } from '../../../common/errors';
 
 export class PopulatedCompanyResponse {
   @ApiProperty({ example: '5e7be8472a863904a7cee171' })
@@ -110,4 +112,9 @@ export class GetAllCompanyUsersResponse {
     isArray: true,
   })
   invitedUsers: GetAllCompanyInvitedUsersResponse;
+}
+
+export class UserNotFoundResponse extends NotFound {
+  @ApiProperty({ example: ErrorMessages.USER_NOT_FOUND })
+  message: string;
 }

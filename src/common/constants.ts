@@ -57,13 +57,13 @@ export const numberOfEmailRetries = 3;
 
 export enum activationEmail {
   FROM = 'noreply@trytouchdown.com',
-  SUBJECT = 'Touchdown! Activate your account',
+  SUBJECT = 'Touchdown! Activate your account!',
   TITLE = 'Touchdown'
 }
 
 export enum invitationEmail {
   FROM = 'noreply@trytouchdown.com',
-  SUBJECT = 'Touchdown! Welcome to touchdown!',
+  SUBJECT = 'Touchdown! Invitation to touchdown!',
   TITLE = 'Touchdown'
 }
 export enum signUpEmailData {
@@ -79,6 +79,12 @@ export enum newTouchdownEmailData {
 export enum newFeedbackEmailData {
   FROM = 'noreply@trytouchdown.com',
   SUBJECT = 'New Feedback!',
+  TITLE = 'Touchdown'
+}
+
+export enum forgotPasswordEmailData {
+  FROM = 'noreply@trytouchdown.com',
+  SUBJECT = 'Reset your password!',
   TITLE = 'Touchdown'
 }
 
