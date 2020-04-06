@@ -4,7 +4,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './config/config.module';
 import { ConfigService } from './config/config.service';
-import { RedisModule } from 'nestjs-redis';
 import { SchemaModule } from './schema/schema.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
@@ -25,10 +24,6 @@ import { TouchdownModule } from './touchdown/touchdown.module';
         useUnifiedTopology: true,
         useFindAndModify: false,
       }),
-    }),
-    RedisModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({ url: configService.redisUri }),
     }),
     SchemaModule.forRoot(),
     HelperModule.forRoot(),

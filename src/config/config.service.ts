@@ -26,7 +26,6 @@ export class ConfigService {
       SERVER_PORT: Joi.number().default(4000),
       MONGO_URI: Joi.string().required(),
       JWT_SECRET: Joi.string().required(),
-      REDIS_URI: Joi.string().required(),
       FRONTEND_APP_URI: Joi.string().uri().required(),
       MAILGUN_API_KEY: Joi.string().required(),
     });
@@ -58,10 +57,6 @@ export class ConfigService {
 
   get mongoUri(): string {
     return this.envConfig.MONGO_URI;
-  }
-
-  get redisUri(): string {
-    return this.envConfig.REDIS_URI;
   }
   
   get frontendAppUri(): string {
