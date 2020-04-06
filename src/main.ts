@@ -45,8 +45,8 @@ async function bootstrap(): Promise<void> {
       origin: [
       'http://localhost:8080',
       'http://localhost:8081',
-      'https://trytouchdown-dev.herokuapp.com/',
-      'https://trytouchdown.herokuapp.com/'
+      'https://trytouchdown-dev.herokuapp.com',
+      'https://trytouchdown.herokuapp.com'
     ],
       credentials: true,
     });
