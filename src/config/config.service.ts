@@ -23,7 +23,7 @@ export class ConfigService {
       NODE_ENV: Joi.string()
         .valid('development', 'production', 'test', 'provision', 'inspection')
         .default('development'),
-      SERVER_PORT: Joi.number().default(4000),
+      PORT: Joi.number().default(4000),
       MONGO_URI: Joi.string().required(),
       JWT_SECRET: Joi.string().required(),
       FRONTEND_APP_URI: Joi.string().uri().required(),
@@ -48,7 +48,7 @@ export class ConfigService {
   }
 
   get serverPort(): number {
-    return this.envConfig.SERVER_PORT;
+    return this.envConfig.PORT;
   }
 
   get jwtSecret(): string {
