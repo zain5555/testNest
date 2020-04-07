@@ -24,7 +24,7 @@ export class ConfigService {
         .valid('development', 'production', 'test', 'provision', 'inspection')
         .default('development'),
       PORT: Joi.number().default(4000),
-      MONGO_URI: Joi.string().required(),
+      MONGODB_URI: Joi.string().required(),
       JWT_SECRET: Joi.string().required(),
       FRONTEND_APP_URI: Joi.string().uri().required(),
       MAILGUN_API_KEY: Joi.string().required(),
@@ -56,7 +56,7 @@ export class ConfigService {
   }
 
   get mongoUri(): string {
-    return this.envConfig.MONGO_URI;
+    return this.envConfig.MONGODB_URI;
   }
   
   get frontendAppUri(): string {
