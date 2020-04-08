@@ -33,7 +33,7 @@ export class InvitationController {
     type: InternalServerErrorWithMessage,
   })
   async invite(@Req() req: RequestWithUser, @Body() body: AddInvitationDto): Promise<any> {
-    return this.invitationService.invite(body.companyId, body.email);
+    return this.invitationService.invite(body.companyId, body.email, req.user);
   }
 
 

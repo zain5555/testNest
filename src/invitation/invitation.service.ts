@@ -5,16 +5,16 @@ import {
   // HttpStatus,
   Inject,
   Injectable,
-  InternalServerErrorException, 
+  InternalServerErrorException,
   // UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {  defaultInternalServerErrorResponse } from '../common/responses';
+import { defaultInternalServerErrorResponse } from '../common/responses';
 // import { QueryFindOneAndUpdateOptionsInterface, QueryGenericOptionsInterface, QueryUpdateInterface } from '../common/interfaces';
 import { StringHelper } from '../helper/string.helper';
 import { CompanyService } from '../company/company.service';
-// import { CompanyInterface } from '../schema/company.schema';
+import { CompanyInterface } from '../schema/company.schema';
 // import { MeInterface } from '../user/types/interfaces/user.interface';
 import { ErrorMessages, ResponseMessages } from '../common/errors';
 import { UserService } from '../user/user.service';
@@ -22,6 +22,7 @@ import { UserInterface } from '../schema/user.schema';
 import { MailGunHelper } from '../helper/mailgun.helper';
 import { AuthService } from '../auth/auth.service';
 import { AddInvitationResponseInterface } from './types/interfaces/invitation.interface';
+
 
 
 
@@ -35,6 +36,7 @@ export class InvitationService {
     private readonly companyService: CompanyService,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService
   ) {
   }
@@ -108,15 +110,23 @@ export class InvitationService {
   // }
 
 
-  async invite(companyId: string, email: string): Promise<AddInvitationResponseInterface> {
+  async invite(companyId: string, email: string, owner: UserInterface): Promise<AddInvitationResponseInterface> {
 
     let session;
     let response: AddInvitationResponseInterface;
 
+    const company: CompanyInterface = await this.companyService.getIfCompanyExistsAndIAmAdmin(companyId, owner._id);
 
-    const User = await this.userService.findOneWhere({ email })
-    if (!User) {
-      const newUser = await this.authService.registerBroker({ email, password: "ABCDEF" }, companyId)
+    if (company) {
+      response = {
+        message: ErrorMessages.GENERIC_FORBIDDEN,
+        email,
+      }
+    }
+
+    const user = await this.userService.findOneWhere({ email })
+    if (!user) {
+      const newUser = await this.authService.registerBroker({ email, password: (await this.stringHelper.generateRandomString(8)).toString() }, companyId)
 
       try {
         session = await this.userModel.db.startSession();
@@ -151,7 +161,7 @@ export class InvitationService {
     else {
       const checkIfUserAlreadyInvited = await this.userService.findAllWhere({
         _id: {
-          $ne: User._id,
+          $ne: user._id,
         },
         isActive: true,
         companies: {
@@ -183,12 +193,12 @@ export class InvitationService {
             },
           },
         }, {
-          _id: User._id,
+          _id: user._id,
         }, { session, lean: true });
         await this.companyService.findOneAndUpdateWhere({
           $push: {
             users: {
-              user: User._id,
+              user: user._id,
             },
           },
         }, {
