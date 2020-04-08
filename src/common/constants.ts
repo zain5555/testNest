@@ -1,10 +1,11 @@
 import * as moment from 'moment';
 
-export const roles: string[] = ['manager', 'employee'];
+export const roles: string[] = ['admin', 'broker', 'user'];
 
 export const enum RolesEnum {
-  MANAGER = 'manager',
-  EMPLOYEE = 'employee'
+  ADMIN = 'admin',
+  BROKER = 'broker',
+  USER = 'user'
 }
 
 import { SignOptions } from 'jsonwebtoken';
@@ -88,7 +89,7 @@ export enum forgotPasswordEmailData {
   TITLE = 'Touchdown'
 }
 
-export const goalsStatus = ['InComplete','InProgress', 'Done'];
+export const goalsStatus = ['InComplete', 'InProgress', 'Done'];
 
 export enum GoalStatus {
   IN_COMPLETE = 'InComplete',

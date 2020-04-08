@@ -3,12 +3,15 @@ import { InvitationController } from './invitation.controller';
 import { InvitationService } from './invitation.service';
 import { CompanyModule } from '../company/company.module';
 import { UserModule } from '../user/user.module';
-import { HelperModule } from '../helper/helper.module';
+import { AuthModule } from '../auth/auth.module';
+
 
 @Module({
   imports: [
     forwardRef(() => CompanyModule),
     forwardRef(() => UserModule),
+    forwardRef(() => AuthModule),
+
   ],
   controllers: [InvitationController],
   providers: [InvitationService],

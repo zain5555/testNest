@@ -6,7 +6,6 @@ import { defaultForbiddenResponse, defaultInternalServerErrorResponse } from '..
 import { QueryFindOneAndUpdateOptionsInterface, QueryGenericOptionsInterface, QueryUpdateInterface } from '../common/interfaces';
 import { GetAllCompanyUsersInterface, MeInterface } from './types/interfaces/user.interface';
 import { CompanyService } from '../company/company.service';
-import { InvitationService } from '../invitation/invitation.service';
 import { ErrorMessages, HttpErrors } from '../common/errors';
 import { RolesEnum } from '../common/constants';
 
@@ -16,8 +15,6 @@ export class UserService {
     @InjectModel('User') private readonly userModel: Model<UserInterface>,
     @Inject(forwardRef(() => CompanyService))
     private readonly companyService: CompanyService,
-    @Inject(forwardRef(() => InvitationService))
-    private readonly invitationService: InvitationService,
   ) {
   }
   
@@ -100,47 +97,5 @@ export class UserService {
     }
   }
   
-  async getAllCompanyUsers(companyId: string, userId: string): Promise<GetAllCompanyUsersInterface> {
-    const user = await this.findOneById(userId);
-    const userCompany = user.companies.find(company => company.company.toString() === companyId);
-    if (!userCompany) {
-      throw new NotFoundException({
-        statusCode: HttpStatus.NOT_FOUND,
-        error: HttpErrors.NOT_FOUND,
-        message: ErrorMessages.COMPANY_NOT_FOUND,
-      });
-    }
-    if (userCompany.role !== RolesEnum.MANAGER) {
-      throw new ForbiddenException(defaultForbiddenResponse);
-    }
-    const joinedUsers = await this.findAllWhere({
-      _id: {
-        $ne: userId,
-      },
-      isActive: true,
-      companies: {
-        $elemMatch: {
-          company: companyId,
-          isActive: true,
-        },
-      },
-    });
-    const invitedUsers = await this.invitationService.findAllWhere({
-      isActive: true,
-      isAccepted: false,
-      company: companyId,
-    });
-    return {
-      joinedUsers: joinedUsers.map(joinedUser => ({
-        fullName: joinedUser.fullName,
-        userId: joinedUser._id,
-        email: joinedUser.email,
-      })),
-      invitedUsers: invitedUsers.map(invitedUser => ({
-        email: invitedUser.email,
-        fullName: invitedUser.email.split('@')[0],
-        invitationId: invitedUser._id,
-      })),
-    };
-  }
+ 
 }

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { forwardRef } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -11,10 +12,10 @@ import { InvitationModule } from '../invitation/invitation.module';
 
 @Module({
   imports: [
-    UserModule,
-    PassportModule,
-    CompanyModule,
-    InvitationModule,
+    forwardRef(() => UserModule),
+    forwardRef(() => PassportModule),
+    forwardRef(() => CompanyModule),
+    forwardRef(() => InvitationModule),
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, RegisterStrategy, SessionSerializer],

@@ -10,7 +10,7 @@ import { UserService } from '../user/user.service';
 import { LoginDto } from './types/dto/auth.dto';
 import { MeInterface } from '../user/types/interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
-import { ActivationJwtInterface, RegisterInterface, RegisterUserInterface, ResetPasswordPayload } from './types/interfaces/auth.interface';
+import {  RegisterInterface, ResetPasswordPayload } from './types/interfaces/auth.interface';
 import { defaultInternalServerErrorResponse } from '../common/responses';
 import { CompanyService } from '../company/company.service';
 import { startCase } from 'lodash';
@@ -30,7 +30,7 @@ export class AuthService {
     private readonly mailGunHelper: MailGunHelper,
   ) {
   }
-  
+
   async validateUser(credentials: LoginDto): Promise<UserInterface | undefined> {
     const user: UserInterface = await this.userService.findOneWhere({ email: credentials.email });
     if (user && user.password && user.isActive && bcrypt.compareSync(credentials.password, user.password)) {
@@ -38,23 +38,23 @@ export class AuthService {
     }
     return undefined;
   }
-  
+
   async getUser(userId: string): Promise<MeInterface> {
     return await this.userService.findOneByIdPopulated(userId);
   }
-  
+
   async getUnpopulatedUser(userId: string): Promise<UserInterface> {
     return await this.userService.findOneById(userId);
   }
-  
-  async register(registerInfo: RegisterInterface, registerByInvitation: boolean): Promise<UserInterface> {
+
+  async register(registerInfo: RegisterInterface): Promise<UserInterface> {
     const email: string = registerInfo.email.trim().toLowerCase();
     const existingUser: UserInterface = await this.userService.findOneWhere({ email });
     if (existingUser && existingUser.isActive) {
       throw new ConflictException({
         statusCode: HttpStatus.CONFLICT,
         error: HttpErrors.CONFLICT,
-        message: registerByInvitation ? ErrorMessages.LOGIN_TO_ACCEPT_INVITE : ErrorMessages.EMAIL_ALREADY_EXISTS,
+        message: ErrorMessages.EMAIL_ALREADY_EXISTS,
       });
     }
     const newUser: UserInterface = {
@@ -62,102 +62,88 @@ export class AuthService {
       password: bcrypt.hashSync(registerInfo.password, 10),
       fullName: startCase(registerInfo.firstName.trim()) + ' ' + startCase(registerInfo.lastName.trim()),
     };
-    if (!registerByInvitation) {
-      let session;
-      try {
-        session = await this.companyService.getSession();
-        await session.startTransaction();
-        const newCompany: CompanyInterface = await this.companyService.insertOne({ name: registerInfo.companyName.trim() }, { session });
-        newUser.companies = [{
-          company: newCompany._id,
-          role: RolesEnum.MANAGER,
-          creator: true,
-          isActive: true,
-        }];
-        const insertedUser: UserInterface = await this.userService.insertOne(newUser, { session });
-        await this.companyService.findOneAndUpdateWhere({
-          creator: insertedUser._id,
-          users: [{
-            user: insertedUser._id,
-            role: RolesEnum.MANAGER,
-          }],
-        }, { _id: newCompany._id }, { session });
-        await session.commitTransaction();
-        this.mailGunHelper.signUpEmail(insertedUser.email, insertedUser.fullName, newCompany.name);
-        return insertedUser;
-      } catch (e) {
-        console.warn(e);
-        session.abortTransaction();
-        throw new InternalServerErrorException(defaultInternalServerErrorResponse);
-      }
-    } else {
-      newUser.isEmailVerified = true;
-      return this.userService.insertOne(newUser);
-    }
-  }
-  
-  async sendActivationLink(email: string, user?: UserInterface): Promise<boolean> {
-    if (!user) {
-      user = await this.userService.findOneWhere({ email });
-    }
-    await this.checkUserActivationStatus(user);
-    const activationObject: ActivationJwtInterface = {
-      email,
-    };
-    const jwt = await this.stringHelper.signPayload(activationObject, email);
-    this.mailGunHelper.activateEmail(jwt, user.email, user.fullName);
-    return true;
-  }
-  
-  async registerByActivationLink(jwt: string): Promise<UserInterface> {
-    let userToBeActivate: ActivationJwtInterface;
+    let session;
     try {
-      userToBeActivate = await this.stringHelper.verifyPayload(jwt) as unknown as ActivationJwtInterface;
+      session = await this.companyService.getSession();
+      await session.startTransaction();
+      const newCompany: CompanyInterface = await this.companyService.insertOne({ name: registerInfo.companyName.trim() }, { session });
+      newUser.companies = [{
+        company: newCompany._id,
+        role: RolesEnum.ADMIN,
+        creator: true,
+        isActive: true,
+      }];
+      const insertedUser: UserInterface = await this.userService.insertOne(newUser, { session });
+      await this.companyService.findOneAndUpdateWhere({
+        creator: insertedUser._id,
+        users: [{
+          user: insertedUser._id,
+          role: RolesEnum.ADMIN,
+        }],
+      }, { _id: newCompany._id }, { session });
+      await session.commitTransaction();
+      this.mailGunHelper.signUpEmail(insertedUser.email, insertedUser.fullName, newCompany.name);
+      return insertedUser;
     } catch (e) {
-      throw new UnprocessableEntityException({
-        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        error: HttpErrors.UNPROCESSABLE_ENTITY,
-        message: e?.message || ErrorMessages.INVALID_JWT,
-      });
+      console.warn(e);
+      session.abortTransaction();
+      throw new InternalServerErrorException(defaultInternalServerErrorResponse);
     }
-    const existingUser: UserInterface = await this.userService.findOneWhere({
-      email: userToBeActivate.email,
-    });
-    if (existingUser && existingUser.isEmailVerified) {
+
+  }
+
+  async registerBroker(registerInfo: RegisterInterface, companyId: string): Promise<UserInterface> {
+    // console.log(registerInfo)
+    const email: string = registerInfo.email.trim().toLowerCase();
+    const existingUser: UserInterface = await this.userService.findOneWhere({ email });
+    if (existingUser && existingUser.isActive) {
       throw new ConflictException({
         statusCode: HttpStatus.CONFLICT,
         error: HttpErrors.CONFLICT,
-        message: ErrorMessages.ALREADY_VERIFIED,
+        message: ErrorMessages.EMAIL_ALREADY_EXISTS,
       });
     }
-    return await this.userService.findOneAndUpdateWhere({
-      isEmailVerified: true,
-    }, {
-      email: userToBeActivate.email,
-    }, {
-      lean: true,
-      new: true,
-    }) as unknown as UserInterface;
+    const newUser: UserInterface = {
+      email: registerInfo.email.trim().toLowerCase(),
+      password: bcrypt.hashSync(registerInfo.password, 10),
+      fullName: registerInfo.firstName? startCase(registerInfo.firstName.trim()) + ' ' + startCase(registerInfo.lastName.trim()) : " ",
+    };
+    let session;
+    try {
+      session = await this.companyService.getSession();
+      await session.startTransaction();
+      const newCompany: CompanyInterface = await this.companyService.findOneWhere({
+        _id: companyId,
+        isActive: true,
+      });
+
+      // newUser.companies = [{
+      //   company: companyId,
+      //   role: RolesEnum.BROKER,
+      //   creator: true,
+      //   isActive: true,
+      // }];
+      const insertedUser: UserInterface = await this.userService.insertOne(newUser, { session });
+      await this.companyService.findOneAndUpdateWhere({
+        creator: insertedUser._id,
+        $push: {
+          users: {
+            user: insertedUser._id,
+            role: RolesEnum.BROKER,          },
+        },
+
+      }, { _id: companyId }, { session });
+      await session.commitTransaction();
+      this.mailGunHelper.signUpEmailForBroker(insertedUser.email, insertedUser.fullName, insertedUser.password, newCompany.name);
+      return insertedUser;
+    } catch (e) {
+      console.warn(e);
+      session.abortTransaction();
+      throw new InternalServerErrorException(defaultInternalServerErrorResponse);
+    }
+
   }
-  
-  async checkUserActivationStatus(user: UserInterface): Promise<boolean> {
-    if (!user || !user.isActive) {
-      throw new UnprocessableEntityException({
-        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-        error: HttpErrors.UNPROCESSABLE_ENTITY,
-        message: ErrorMessages.REGISTER_FIRST,
-      });
-    }
-    if (user.isEmailVerified) {
-      throw new ConflictException({
-        statusCode: HttpStatus.CONFLICT,
-        error: HttpErrors.CONFLICT,
-        message: ErrorMessages.ALREADY_VERIFIED,
-      });
-    }
-    return true;
-  }
-  
+
   async forgotPassword(email: string): Promise<boolean> {
     const user = await this.userService.findOneWhere({ email, isActive: true });
     if (!user) {
@@ -173,7 +159,7 @@ export class AuthService {
     this.mailGunHelper.forgotPasswordEmail(jwt, user.email, user.fullName);
     return true;
   }
-  
+
   async resetPassword(data: ResetPasswordPayload): Promise<any> {
     let jwtData: { email: string };
     try {
@@ -200,5 +186,5 @@ export class AuthService {
       new: true
     });
   }
-  
+
 }

@@ -2,8 +2,7 @@ import { DynamicModule, Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from './user.schema';
 import { CompanySchema } from './company.schema';
-import { InvitationSchema } from './invitation.schema';
-import { TouchdownSchema } from './touchdown.schema';
+
 
 const schemaArray = [
   MongooseModule.forFeature([
@@ -17,16 +16,6 @@ const schemaArray = [
       schema: CompanySchema,
       collection: 'companies',
     },
-    {
-      name: 'Invitation',
-      schema: InvitationSchema,
-      collection: 'invitations',
-    },
-    {
-      name: 'Touchdown',
-      schema: TouchdownSchema,
-      collection: 'touchdowns'
-    }
   ]),
 ];
 

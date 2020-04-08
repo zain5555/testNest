@@ -15,6 +15,7 @@ export class CompanyService {
   async findOneWhere(where: unknown, projection?: unknown): Promise<CompanyInterface> {
     try {
       return await this.companyModel.findOne(where).select(projection).lean();
+
     } catch (e) {
       console.warn(e);
       throw new InternalServerErrorException(defaultInternalServerErrorResponse);
@@ -65,9 +66,18 @@ export class CompanyService {
     return company;
   }
   
-  async getIfCompanyExistsAndIAmManager(companyId: string, userId: string): Promise<CompanyInterface> {
+  async getIfCompanyExistsAndIAmAdmin(companyId: string, userId: string): Promise<CompanyInterface> {
     const company = await this.getIfCompanyExists(companyId, userId);
-    const user: SubUserInterface = company.users.find(user => user.user.toString() === userId.toString() && user.role === RolesEnum.MANAGER && user.isActive);
+    const user: SubUserInterface = company.users.find(user => user.user.toString() === userId.toString() && user.role === RolesEnum.ADMIN && user.isActive);
+    if (!user) {
+      throw new ForbiddenException(defaultForbiddenResponse)
+    }
+    return company;
+  }
+
+  async getIfCompanyExistsAndIAmBroker(companyId: string, userId: string): Promise<CompanyInterface> {
+    const company = await this.getIfCompanyExists(companyId, userId);
+    const user: SubUserInterface = company.users.find(user => user.user.toString() === userId.toString() && user.role === RolesEnum.BROKER && user.isActive);
     if (!user) {
       throw new ForbiddenException(defaultForbiddenResponse)
     }

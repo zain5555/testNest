@@ -1,8 +1,7 @@
-import { InvitationInterface } from '../../../schema/invitation.schema';
+// import { InvitationInterface } from '../../../schema/invitation.schema';
 
 export interface AddInvitationResponseInterface {
   email: string;
-  invitationId: string;
   message: string;
 }
 
@@ -15,6 +14,6 @@ export interface InvitationJwtInterface {
   };
 }
 
-export interface InsertedInvitationsInterface {
-  _doc: InvitationInterface;
-}
+// export interface InsertedInvitationsInterface {
+//   _doc: InvitationInterface;
+// }

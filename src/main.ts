@@ -30,8 +30,7 @@ async function bootstrap(): Promise<void> {
     .setVersion('1.0')
     .addTag('Auth', 'Auth API Endpoints!')
     .addTag('User', 'User API Endpoints!')
-    .addTag('Invitation', 'Invitation API Endpoints!')
-    .addTag('Touchdown', 'Touchdown API Endpoints!')
+    // .addTag('Invitation', 'Invitation API Endpoints!')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

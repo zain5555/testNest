@@ -10,7 +10,7 @@ export class AddInvitationDto {
   @IsEmail({}, {
     each: true,
   })
-  emails: string[];
+  email: string;
 }
 
 export class InvitationIdDto {

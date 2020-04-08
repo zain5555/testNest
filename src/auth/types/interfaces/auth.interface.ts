@@ -6,8 +6,8 @@ export interface CredentialsInterface {
 }
 
 export interface RegisterInterface extends CredentialsInterface {
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   companyName?: string;
   avatar?: string;
 }
