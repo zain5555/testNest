@@ -39,7 +39,7 @@
     "connect-mongodb-session": "^2.3.1",
     "dotenv": "^8.2.0",
     "express-session": "^1.17.0",
-    "handlebars": "^4.7.3",
+    "handlebars": "^4.7.7",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
